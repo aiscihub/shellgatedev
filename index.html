@@ -116,6 +116,17 @@ button{font:inherit;color:inherit}
 .alab{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:9.5px;line-height:1;padding:1.5px 3.5px;border-radius:3px;white-space:nowrap;
   background:rgba(8,16,18,.74);letter-spacing:.02em}
+.rlab{position:absolute;transform:translate(-50%,-50%);font-family:Archivo,sans-serif;font-size:10.5px;
+  font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 4px rgba(0,0,0,.75);
+  white-space:nowrap;letter-spacing:.01em}
+.rlab.at{color:#2B1806;text-shadow:0 1px 2px rgba(255,255,255,.6)}
+.fnlab{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9.5px;font-weight:600;color:#F09B4A;letter-spacing:.02em;white-space:nowrap;
+  text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 4px rgba(0,0,0,.8)}
+.tlab.ss{color:#C4B4F5;border-color:rgba(160,140,240,.5)}
+.tlab{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9px;color:#E9F2F1;background:rgba(10,20,22,.82);border:1px solid rgba(160,190,195,.45);
+  border-radius:4px;padding:2px 5px;white-space:nowrap}
 .alab.m{color:#8FE3EA;border:1px solid rgba(143,227,234,.4);background:rgba(8,16,18,.86)}
 .scalebar{position:absolute;right:12px;bottom:11px;display:flex;align-items:center;gap:7px;color:#9DB6B9}
 .scalebar .bar{height:2px;background:#9DB6B9;border-radius:1px;display:block}
@@ -358,6 +369,7 @@ svg.plot text{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular
         <div class="legend3d" id="legend3d"></div>
       </div>
       <div class="vp-tools">
+        <button class="tool" type="button" data-t="pep">Peptide</button>
         <button class="tool" type="button" data-t="site">Site</button>
         <button class="tool on" type="button" data-t="her2">HER2</button>
         <button class="tool on" type="button" data-t="cargo">Cargo</button>
@@ -540,13 +552,13 @@ cargo:{label:'Model cargo',items:[
 
 peptide:{label:'Targeting peptide',items:[
  {id:'cglt',name:'CGLTVSPWY',tag:'CGL',meta:'9 residues · N-term Cys-Gly handle',color:'--s1',
-  seq:'CGLTVSPWY',n:9,baseQ:0.666,iqr:'0.606–0.688',handleQ:1.00,mw:1024,anchorIdx:0,
+  seq:'CGLTVSPWY',n:9,baseQ:0.666,iqr:'0.606–0.688',handleQ:1.00,mw:1024,anchorIdx:0,handleIdx:1,
   handle:'Engineered N-terminal Cys-Gly handle',
   facts:[['Sequence','CGLTVSPWY'],['Parent','LTVSPWY (phage-display)'],['Attachment','Cys1 thiol, N-terminal'],
    ['Measured Qₕₑᵣ₂','0.666 [0.606–0.688]'],['Configurations','6 across 3 PDA packings']],
   blurb:'Shortest of the three and the best behaved near PDA: the engineered Cys-Gly handle keeps the LTVSPWY recognition face pointing away from the surface.'},
  {id:'ahnp',name:'AHNP-GC',tag:'AHN',meta:'14 residues · C-term Gly-Cys handle',color:'--s2',
-  seq:'YCDGFYACYMDVGC',n:14,baseQ:0.487,iqr:'0.438–0.513',handleQ:0.97,mw:1563,anchorIdx:13,
+  seq:'YCDGFYACYMDVGC',n:14,baseQ:0.487,iqr:'0.438–0.513',handleQ:0.97,mw:1563,anchorIdx:13,handleIdx:12,ss:[[1,7]],
   handle:'C-terminal Gly-Cys handle, Cys2–Cys8 disulfide retained',
   facts:[['Sequence','YCDGFYACYMDVGC'],['Parent','AHNP (trastuzumab mimetic)'],['Attachment','Cys14, C-terminal'],
    ['Measured Qₕₑᵣ₂','0.487 [0.438–0.513]'],['Structural','Cys2–Cys8 disulfide must survive']],
@@ -660,6 +672,11 @@ function renderStack(){
   if(S.freePDA) rows.push(el3('free '+find('coating',S.coating).tag+' aggregates','var(--pda)'));
   if(S.show.cargo) rows.push(el3(find('cargo',S.cargo).name,'var(--flu)'));
   if(p) rows.push(el3(p.name,`var(${p.color})`));
+  if(p&&S.mode==='pep'){
+    rows.push(el3('Cys thiol (\u2013SH) \u00b7 attachment','#E8863A'));
+    if(p.handleIdx!=null) rows.push(el3('handle residue','#8A8F98'));
+    if(p.ss) rows.push(el3('structural disulfide','#5A4794'));
+  }
   if(S.show.her2) rows.push(el3('HER2 ectodomain','#74B389'));
   $('#legend3d').innerHTML=rows.join('');
 }
@@ -904,7 +921,9 @@ const C3={zif:0xB8B0D8,edge:0xD6CFF0,bond:0x9A9470,pda:0x6E5949,pdaHull:0x4A3A30
   pep:{cglt:0x2CA58D,ahnp:0xD17414,p51:0x9763CC,scr:0x8B9995}};
 const R=1.12;
 let scene,camera,renderer,root,raycaster,tris=[],G={},dragging=null,moved=0;
-let labelAtoms=[],siteMeas=[],labelPool=[];
+let labelAtoms=[],siteMeas=[],labelPool=[],resLabels=[];
+const AA3={A:'Ala',R:'Arg',N:'Asn',D:'Asp',C:'Cys',E:'Glu',Q:'Gln',G:'Gly',H:'His',I:'Ile',
+  L:'Leu',K:'Lys',M:'Met',F:'Phe',P:'Pro',S:'Ser',T:'Thr',W:'Trp',Y:'Tyr',V:'Val'};
 const sph={r:7.0,th:0.72,ph:1.18};
 const HOME=new THREE.Vector3(.62,0,0);
 let focus=new THREE.Vector3(.62,0,0), focusTarget=new THREE.Vector3(.62,0,0), rTarget=7.0, lblN=0, lblSel=[];
@@ -1185,10 +1204,10 @@ function build3D(){
 
   /* --- crystal --- */
   G.carrier=new THREE.Group();
-  const atomic=S.rep!=='solid';
+  const atomic=S.rep!=='solid'&&S.mode!=='pep';
   const cm=new THREE.MeshStandardMaterial({color:C3.zif,flatShading:true,roughness:.42,metalness:.14,
-    transparent:true,opacity:atomic?0.05:(S.show.cut?0.24:0.55),
-    depthWrite:atomic?false:!S.show.cut});
+    transparent:true,depthWrite:false,
+    opacity:S.mode==='pep'?0.16:(atomic?0.05:(S.show.cut?0.24:0.55))});
   const mesh=new THREE.Mesh(geo,cm); mesh.userData={kind:'carrier'};
   const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo),
     new THREE.LineBasicMaterial({color:C3.edge,transparent:true,opacity:atomic?.26:.5}));
@@ -1200,7 +1219,7 @@ function build3D(){
   root.add(G.carrier);
 
   /* --- cargo --- */
-  if(S.show.cargo){
+  if(S.show.cargo&&S.mode!=='pep'){
     G.cargo=new THREE.Group();
     const rnd=mulberry(7), n=85, cr=R*dia;
     const cg=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(cr*0.030,1),
@@ -1221,13 +1240,13 @@ function build3D(){
     new THREE.MeshStandardMaterial({color:C3.pdaHull,flatShading:true,roughness:.95,
       transparent:true,opacity:S.rep!=='solid'?.10:.30,depthWrite:false}));
   hull.userData={kind:'coating'};
-  const cnt=Math.round(85+S.shell*15), ig=new THREE.IcosahedronGeometry(.028,0);
+  const cnt=Math.round((85+S.shell*15)*(S.mode==='pep'?0.35:1)), ig=new THREE.IcosahedronGeometry(.028,0);
   const im=new THREE.InstancedMesh(ig,new THREE.MeshStandardMaterial({color:C3.pda,roughness:.85,flatShading:true}),cnt);
   const rnd2=mulberry(21), M=new THREE.Matrix4(), q=new THREE.Quaternion(), sc=new THREE.Vector3();
   for(let i=0;i<cnt;i++){
     const P=surfPt(rnd2,0.8), N=P.clone().normalize();
     P.addScaledVector(N,0.006+S.shell*0.0016);
-    if(S.mode==='site'&&S.siteP&&P.distanceTo(S.siteP)<0.34){
+    if(S.mode!=='particle'&&S.siteP&&P.distanceTo(S.siteP)<0.34){
       sc.set(0,0,0); M.compose(P,q,sc); im.setMatrixAt(i,M); continue;   // keep the site readable
     }
     const s=0.42+rnd2()*0.70+S.shell*0.016; sc.set(s,s*0.82,s);
@@ -1237,7 +1256,7 @@ function build3D(){
   im.instanceMatrix.needsUpdate=true; im.userData={kind:'coating'};
   if(!S.show.cut) G.coating.add(hull,im);
   // free PDA formed away from the cores — S3 fields show this, and it scales with dopamine load
-  const freeN=S.mode==='site'?0:Math.round(clamp((S.shell-5)*13,0,150));
+  const freeN=S.mode!=='particle'?0:Math.round(clamp((S.shell-5)*13,0,150));
   S.freePDA=freeN>0;
   if(freeN>0){
     const fm=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.034,0),
@@ -1259,18 +1278,29 @@ function build3D(){
   }
   root.add(G.coating);
 
-  /* --- peptides --- */
+  /* --- peptides: labelled residue chain, cysteines gold, disulfides bridged --- */
+  resLabels=[]; S.pepCenter=null;
   if(p){
     G.peptide=new THREE.Group();
-    const col=C3.pep[p.id]||0x8B9995;
-    const Lt=0.19+p.n*0.0145+S.link*0.052;
+    const colH=C3.pep[p.id]||0x8B9995;
+    const col=new THREE.Color(colH);
+    const cAttach=new THREE.Color(0xE8863A);   // designated attachment thiol
+    const cHandle=new THREE.Color(0x8A8F98);   // engineered handle partner
+    const cSS=new THREE.Color(0x5A4794);       // structural disulfide
+    const ssSet=new Set(); (p.ss||[]).forEach(([a,b])=>{ssSet.add(a);ssSet.add(b);});
+    const roleCol=k=>k===p.anchorIdx?cAttach:(p.handleIdx===k?cHandle:(ssSet.has(k)?cSS:col));
+    const Lt=0.21+p.n*0.018+S.link*0.055;
     const fold=clamp(1-r.A,0,.9);
-    const tubeMat=new THREE.MeshStandardMaterial({color:col,roughness:.5,metalness:.05});
-    const beadG=new THREE.SphereGeometry(.042,7,5);
-    const beads=new THREE.InstancedMesh(beadG,new THREE.MeshStandardMaterial({color:col,roughness:.55}),nCh*p.n);
+    const isolate=(S.mode==='site'||S.mode==='pep');
+    const tubeMat=new THREE.MeshStandardMaterial({color:colH,roughness:.5,metalness:.05});
+    const spac=Lt/(p.n-1||1), brad=spac*0.40;   // gap of ~20% of spacing between beads
+    const beads=new THREE.InstancedMesh(new THREE.SphereGeometry(brad,14,10),
+      new THREE.MeshStandardMaterial({color:0xffffff,roughness:.44,metalness:.02}),nCh*p.n);
+    const rev=p.anchorIdx>0;                       // C-terminal handle: residue 1 sits at the tip
+    const tOf=k=>(rev?(p.n-1-k):k)/(p.n-1||1);
     let bi=0;
     for(let c=0;c<nCh;c++){
-      if(S.mode==='site'&&c!==S.siteIdx) continue;   // isolate the inspected chain
+      if(isolate&&c!==S.siteIdx) continue;
       const {P,N}=anchors[c];
       let T=anchors[c].T.clone();
       T.sub(N.clone().multiplyScalar(T.dot(N))).normalize();
@@ -1279,23 +1309,56 @@ function build3D(){
         P.clone().addScaledVector(N,Lt*0.66).addScaledVector(T,Lt*0.22*fold),
         P.clone().addScaledVector(N,Lt*(0.98-0.60*fold)).addScaledVector(T,Lt*(0.60*fold+0.10))];
       const curve=new THREE.CatmullRomCurve3(pts);
-      const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.026,6,false),tubeMat);
+      const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,28,brad*0.24,6,false),tubeMat);
       tube.userData={kind:'peptide'}; G.peptide.add(tube);
+      const rp=[];
       for(let k=0;k<p.n;k++){
-        const v=curve.getPoint(k/(p.n-1||1));
-        M.compose(v,new THREE.Quaternion(),new THREE.Vector3(1,1,1)); beads.setMatrixAt(bi++,M);
+        const v=curve.getPoint(tOf(k)); rp.push(v);
+        M.compose(v,new THREE.Quaternion(),new THREE.Vector3(1,1,1));
+        beads.setMatrixAt(bi,M);
+        beads.setColorAt(bi,roleCol(k));
+        bi++;
       }
-      const cys=new THREE.Mesh(new THREE.SphereGeometry(.055,9,7),
-        new THREE.MeshStandardMaterial({color:C3.cys,roughness:.4,emissive:C3.cys,emissiveIntensity:.18}));
+      const cys=new THREE.Mesh(new THREE.SphereGeometry(brad*1.55,12,9),
+        new THREE.MeshStandardMaterial({color:0xE8863A,roughness:.4,
+          emissive:0xE8863A,emissiveIntensity:.22}));
       cys.position.copy(P); cys.userData={kind:'peptide',ci:c}; G.peptide.add(cys);
       if(S.mode==='site'&&c===S.siteIdx) cys.visible=false;   // replaced by the atomistic Sγ
-      const tip=new THREE.Mesh(new THREE.SphereGeometry(.062,10,8),
-        new THREE.MeshStandardMaterial({color:col,roughness:.35,emissive:col,emissiveIntensity:.3}));
-      tip.position.copy(curve.getPoint(1)); tip.userData={kind:'peptide'}; G.peptide.add(tip);
+
+      if(c===S.siteIdx){
+        S.pepCenter=curve.getPoint(0.5);
+        for(let k=0;k<p.n;k++){
+          const at=k===p.anchorIdx;
+          resLabels.push({p:rp[k],t:(AA3[p.seq[k]]||p.seq[k])+(at?(k+1):''),
+            cls:at?'rlab at':'rlab'});
+        }
+        const aP=rp[p.anchorIdx];
+        resLabels.push({p:aP.clone().addScaledVector(T,brad*2.6),t:'\u2013SH',cls:'fnlab'});
+        const out=k=>rp[k].clone().sub(P).normalize().multiplyScalar(.085).add(rp[k]);
+        resLabels.push({p:out(0),t:'NH2',cls:'tlab'},{p:out(p.n-1),t:'COOH',cls:'tlab'});
+        (p.ss||[]).forEach(([a,b])=>{                       // structural disulfide
+          const A=rp[a], B=rp[b], mid=A.clone().add(B).multiplyScalar(.5);
+          const d=B.clone().sub(A), L=d.length();
+          const q2=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),d.clone().normalize());
+          const br=new THREE.Mesh(new THREE.CylinderGeometry(brad*0.26,brad*0.26,L,6),
+            new THREE.MeshStandardMaterial({color:0x5A4794,roughness:.45}));
+          br.position.copy(mid); br.quaternion.copy(q2);
+          br.userData={kind:'peptide'}; G.peptide.add(br);
+          [0.34,0.66].forEach(t=>{
+            const sp=new THREE.Mesh(new THREE.SphereGeometry(brad*0.62,10,8),
+              new THREE.MeshStandardMaterial({color:0x5A4794,roughness:.4,
+                emissive:0x5A4794,emissiveIntensity:.25}));
+            sp.position.copy(A.clone().lerp(B,t)); sp.userData={kind:'peptide'}; G.peptide.add(sp);
+          });
+          resLabels.push({p:mid,t:'S\u2013S',cls:'tlab ss'});
+        });
+      }
     }
     const zero=new THREE.Vector3(0,0,0), qz=new THREE.Quaternion(), org=new THREE.Vector3();
     for(;bi<nCh*p.n;bi++){ M.compose(org,qz,zero); beads.setMatrixAt(bi,M); }
-    beads.instanceMatrix.needsUpdate=true; beads.userData={kind:'peptide'};
+    beads.instanceMatrix.needsUpdate=true;
+    if(beads.instanceColor) beads.instanceColor.needsUpdate=true;
+    beads.userData={kind:'peptide'};
     G.peptide.add(beads); root.add(G.peptide);
   }
 
@@ -1363,7 +1426,7 @@ function init3D(){
   cv.addEventListener('pointerup',e=>{ if(dragging&&moved<5) pick(e); dragging=null; });
   cv.addEventListener('pointercancel',()=>dragging=null);
   cv.addEventListener('wheel',e=>{e.preventDefault();
-    rTarget=clamp(rTarget*(1+e.deltaY*.0011),S.mode==='site'?0.30:1.45,13);},{passive:false});
+    rTarget=clamp(rTarget*(1+e.deltaY*.0011),S.mode==='particle'?1.45:0.30,13);},{passive:false});
   new ResizeObserver(()=>{
     if(!vp.clientWidth)return;
     camera.aspect=vp.clientWidth/vp.clientHeight; camera.updateProjectionMatrix();
@@ -1371,7 +1434,7 @@ function init3D(){
   }).observe(vp);
   (function loop(){
     requestAnimationFrame(loop);
-    if(S.show.spin&&!dragging&&S.mode!=='site')sph.th+=.0022;
+    if(S.show.spin&&!dragging&&S.mode==='particle')sph.th+=.0022;
     sph.r+=(rTarget-sph.r)*0.13;
     focus.lerp(focusTarget,0.13);
     camera.position.set(focus.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th),
@@ -1390,32 +1453,44 @@ function lblEl(i){
   return labelPool[i];
 }
 function updateLabels(){
-  const site=S.mode==='site', on=site||sph.r<2.6;
+  const site=S.mode==='site', pep=S.mode==='pep';
+  const showEl=site||(!pep&&sph.r<2.6);
+  const showRes=pep||sph.r<3.2;
   const bar=document.getElementById('scalebar');
   if(bar) bar.hidden=!site;
-  if(!on){ labelPool.forEach(el=>el.style.display='none'); return; }
-  if(lblN++%18===0){
-    lblSel=labelAtoms.map(a=>({a,d:a.p.distanceToSquared(focus)}))
-      .sort((x,y)=>x.d-y.d).slice(0,site?24:18).map(x=>x.a);
-  }
+  if(!showEl&&!showRes){ labelPool.forEach(el=>el.style.display='none'); return; }
   const w=renderer.domElement.clientWidth, h=renderer.domElement.clientHeight;
   const v=new THREE.Vector3(); let i=0;
   const put=(pos,text,col,cls)=>{
     v.copy(pos).project(camera);
     const el=lblEl(i++);
     if(v.z>1||v.z<-1){ el.style.display='none'; return; }
-    el.style.display=''; el.className='alab'+(cls||''); el.textContent=text;
-    el.style.color=col; el.style.left=((v.x*.5+.5)*w).toFixed(1)+'px';
+    el.style.display=''; el.className=cls; el.textContent=text;
+    el.style.color=col||''; el.style.left=((v.x*.5+.5)*w).toFixed(1)+'px';
     el.style.top=((-v.y*.5+.5)*h).toFixed(1)+'px';
   };
-  lblSel.forEach(a=>put(a.p,site&&a.name?a.name:a.el,ELCOL[a.el]||'#B4C0C7'));
-  if(site) siteMeas.forEach(m=>put(m.a.clone().add(m.b).multiplyScalar(.5),m.t,'#8FE3EA',' m'));
+  if(showEl){
+    if(lblN++%18===0){
+      lblSel=labelAtoms.map(a=>({a,d:a.p.distanceToSquared(focus)}))
+        .sort((x,y)=>x.d-y.d).slice(0,site?24:18).map(x=>x.a);
+    }
+    lblSel.forEach(a=>put(a.p,site&&a.name?a.name:a.el,ELCOL[a.el]||'#B4C0C7','alab'));
+    if(site) siteMeas.forEach(m=>put(m.a.clone().add(m.b).multiplyScalar(.5),m.t,'#8FE3EA','alab m'));
+  }
+  if(showRes) resLabels.forEach(r=>put(r.p,r.t,'',r.cls||'rlab'));
   for(;i<labelPool.length;i++) labelPool[i].style.display='none';
   if(site&&bar){
     const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
     const a=focus.clone().project(camera), b=focus.clone().addScaledVector(right,5*AA).project(camera);
     bar.querySelector('.bar').style.width=Math.max(8,Math.abs(b.x-a.x)*.5*w).toFixed(0)+'px';
   }
+}
+function enterPep(){
+  S.mode='pep'; S.sel={kind:'peptide',id:S.peptide};
+  build3D();
+  if(S.pepCenter) focusTarget.copy(S.pepCenter);
+  rTarget=1.15; syncTools(); renderAll();
+  $('#vp-note').style.display='none';
 }
 function enterSite(idx){
   S.mode='site'; S.siteIdx=idx|0; S.sel={kind:'site',id:'site'};
@@ -1433,7 +1508,8 @@ function exitSite(){
 }
 function syncTools(){
   $$('.tool').forEach(t=>t.classList.toggle('on',
-    t.dataset.t==='site'?S.mode==='site':!!S.show[t.dataset.t]));
+    t.dataset.t==='site'?S.mode==='site':
+    t.dataset.t==='pep'?S.mode==='pep':!!S.show[t.dataset.t]));
 }
 function pick(e){
   const rect=renderer.domElement.getBoundingClientRect();
@@ -1491,11 +1567,12 @@ document.addEventListener('click',e=>{
   const tool=e.target.closest('.tool');
   if(tool){ const t=tool.dataset.t;
     if(t==='site'){ S.mode==='site'?exitSite():enterSite(S.siteIdx); return; }
+    if(t==='pep'){ S.mode==='pep'?exitSite():enterPep(); return; }
     S.show[t]=!S.show[t]; tool.classList.toggle('on',S.show[t]);
     if(t!=='spin') build3D(); return; }
 });
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&S.mode==='site'){ exitSite(); return; }
+  if(e.key==='Escape'&&S.mode!=='particle'){ exitSite(); return; }
   if(e.key!=='Enter'&&e.key!==' ')return;
   const el=e.target.closest('.chip[data-kind],.rk[data-pep],.lib');
   if(el){ e.preventDefault(); el.click(); }

@@ -20,6 +20,13 @@ Assemble a targeted MOF carrier and get a ranked shortlist before anything is sy
   ball-and-stick / stick, the way a molecular viewer does. Element colours follow the usual
   convention: olive carbon, periwinkle nitrogen, white hydrogen, green zinc, red oxygen. HER2 is
   drawn as a cartoon — beta strands as flat arrows, helices as coiled ribbons, loops as tubes.
+- **Peptide view** — the `Peptide` tool frames the chain as a residue diagram: one bead per
+  residue on a thin thread, three-letter codes, and NH2/COOH termini. Residues are coloured by
+  role, following the attachment-architecture figure: **orange** for the designated attachment
+  thiol (labelled with its number and its –SH group), **grey** for the engineered handle partner,
+  **purple** for structural-disulfide cysteines with the S–S bridge drawn, and the chain colour for
+  everything else. Which terminus sits at the surface follows `anchorIdx`, so AHNP-GC's C-terminal
+  handle renders reversed against the other two. The carrier fades to a faint shell so the chain reads.
 - **Binding-site inspection** — click any gold Cys anchor, or the `Site` tool, to fly into the
   attachment chemistry: a DHI-derived indole-5,6-quinone carrying the cysteine thioether adduct,
   with per-atom labels, bond-length callouts and an Å scale bar. Element labels also appear in
@@ -62,6 +69,7 @@ Everything is in `index.html` — no build step, no package manager.
 | `buildSite` / `AA` | Cys–PDA adduct at true scale; one Å-per-world-unit for all atoms |
 | `molGroup` / `VDW` / `BSR` / `ELC` | Shared atom+bond renderer; the three representations |
 | `her2Ribbon` / `ribbonGeom` | Cartoon protein: swept arrow ribbons, helices, loop tubes |
+| `AA3` / `resLabels` | Three-letter residue codes and the peptide-diagram label layer |
 | `updateLabels` / `enterSite` | Projected element labels, scale bar, camera focus animation |
 
 ## Iterating
