@@ -1,0 +1,1586 @@
+<title>MOFlect</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EAEDE9; --panel:#F3F5F3; --panel-2:#E2E7E2; --sunk:#DCE2DC;
+  --ink:#151B19; --ink-2:#4E5A56; --ink-3:#7A8681;
+  --line:#CDD5CF; --line-2:#BAC4BD;
+  --accent:#12626E; --accent-2:#0E4E58; --accent-ink:#FFFFFF; --accent-wash:#DDEAEB;
+  --pass:#2E7D52; --warn:#A8721B; --fail:#AF3A31;
+  --s1:#00897B; --s2:#C2622D; --s3:#8E4595; --s4:#6B7772;
+  --r74:#2A6FB5; --r50:#C2622D;
+  --flu:#7E8F10; --pda:#4A3A30; --zif:#5C7387;
+  --shadow:0 1px 2px rgba(20,40,35,.07),0 8px 20px -12px rgba(20,40,35,.22);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0D1315; --panel:#141B20; --panel-2:#1C262A; --sunk:#0F1619;
+  --ink:#E7EDEA; --ink-2:#A5B2AD; --ink-3:#78867F;
+  --line:#28343A; --line-2:#374549;
+  --accent:#3FA9B4; --accent-2:#5EC2CC; --accent-ink:#06181B; --accent-wash:#16323A;
+  --pass:#4FB07A; --warn:#D0932F; --fail:#E06B60;
+  --s1:#2CA58D; --s2:#D17414; --s3:#9763CC; --s4:#8B9995;
+  --r74:#5A93D6; --r50:#D17414;
+  --flu:#C9DE3F; --pda:#8A7263; --zif:#9DB4C6;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -14px rgba(0,0,0,.7);
+}}
+:root[data-theme="dark"]{
+  --bg:#0D1315; --panel:#141B20; --panel-2:#1C262A; --sunk:#0F1619;
+  --ink:#E7EDEA; --ink-2:#A5B2AD; --ink-3:#78867F;
+  --line:#28343A; --line-2:#374549;
+  --accent:#3FA9B4; --accent-2:#5EC2CC; --accent-ink:#06181B; --accent-wash:#16323A;
+  --pass:#4FB07A; --warn:#D0932F; --fail:#E06B60;
+  --s1:#2CA58D; --s2:#D17414; --s3:#9763CC; --s4:#8B9995;
+  --r74:#5A93D6; --r50:#D17414;
+  --flu:#C9DE3F; --pda:#8A7263; --zif:#9DB4C6;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 24px -14px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;
+  font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.011em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.shell{max-width:1460px;margin:0 auto;padding:14px 18px 40px}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:2px 2px 14px}
+.brand{display:flex;align-items:baseline;gap:9px}
+.brand b{font-size:20px;font-weight:700;letter-spacing:-.03em}
+.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);align-self:center}
+.brand span{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.crumbs{display:flex;align-items:center;gap:7px;margin-left:6px}
+.crumb{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  padding:3px 9px;border-radius:100px;border:1px solid transparent}
+.crumb.on{color:var(--accent);border-color:var(--line);background:var(--panel)}
+.crumb i{font-style:normal;opacity:.5;margin-right:5px}
+.sep{color:var(--line-2)}
+.top .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.proj{font-size:12px;color:var(--ink-2)}
+.proj b{color:var(--ink);font-weight:600}
+.iconbtn{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:5px 10px;
+  font-size:12px;cursor:pointer;color:var(--ink-2)}
+.iconbtn:hover{border-color:var(--line-2);color:var(--ink)}
+
+/* ---------- work grid ---------- */
+.work{display:grid;grid-template-columns:246px minmax(0,1fr) 322px;gap:13px;align-items:stretch}
+.rail{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;
+  display:flex;flex-direction:column;min-height:0}
+.rail-h{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px;border-bottom:1px solid var(--line)}
+.rail-h h2{font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2)}
+.rail-h em{font-style:normal;font-size:10.5px;color:var(--ink-3)}
+.rail-b{padding:9px;display:flex;flex-direction:column;gap:13px;flex:1;min-height:0;overflow-y:auto}
+.grp>h3{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 6px 3px;font-weight:600}
+.grp{display:block}
+.items{display:flex;flex-direction:column;gap:5px}
+
+/* library card */
+.lib{display:grid;grid-template-columns:22px 1fr;gap:9px;align-items:center;width:100%;text-align:left;
+  padding:7px 8px;border:1px solid var(--line);background:var(--panel-2);border-radius:8px;
+  cursor:grab;transition:border-color .13s,transform .13s,background .13s}
+.lib:hover{border-color:var(--accent);background:var(--accent-wash)}
+.lib:active{cursor:grabbing;transform:scale(.985)}
+.lib{-webkit-user-select:none;user-select:none}
+.lib.on{border-color:var(--accent);background:var(--accent-wash);box-shadow:inset 2px 0 0 var(--accent)}
+.lib.used{opacity:.55}
+.lib .sw{width:22px;height:22px;border-radius:5px;display:grid;place-items:center;
+  font-size:9px;font-weight:600;color:#fff;letter-spacing:.02em}
+.lib .nm{display:block;font-size:12.5px;font-weight:500;line-height:1.2;letter-spacing:-.01em}
+.lib .mt{display:block;font-size:10.5px;color:var(--ink-3);line-height:1.3;margin-top:1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib .mt.mono{font-size:9.5px;letter-spacing:-.02em}
+
+/* ---------- viewport ---------- */
+.stage{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel);
+  display:flex;flex-direction:column;min-height:0}
+.vp{position:relative;flex:1;min-height:470px;
+  background:radial-gradient(120% 100% at 50% 8%,#1D2E33 0%,#131E22 46%,#0B1214 100%)}
+.vp.drop::after{content:"";position:absolute;inset:9px;border:2px dashed var(--accent-2);
+  border-radius:9px;background:rgba(63,169,180,.09);pointer-events:none}
+.vp canvas{display:block;width:100%;height:100%;touch-action:none}
+.vp-hud{position:absolute;left:12px;top:11px;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.vp-title{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:#7FA0A6}
+.vp-name{font-size:15px;font-weight:600;color:#EAF2F1;letter-spacing:-.015em;margin-top:-2px}
+.legend3d{display:flex;flex-direction:column;gap:3px;margin-top:5px}
+.l3{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#9DB6B9}
+.l3 i{width:9px;height:9px;border-radius:2.5px;display:block}
+.vp-tools{position:absolute;right:11px;top:11px;display:flex;gap:5px}
+.tool{background:rgba(12,22,25,.72);border:1px solid rgba(140,175,180,.24);color:#C7D8D9;
+  border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer;backdrop-filter:blur(6px)}
+.tool:hover{border-color:rgba(140,175,180,.5);color:#EAF2F1}
+.tool.on{background:var(--accent);border-color:var(--accent);color:#04191C;font-weight:500}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.alab{position:absolute;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9.5px;line-height:1;padding:1.5px 3.5px;border-radius:3px;white-space:nowrap;
+  background:rgba(8,16,18,.74);letter-spacing:.02em}
+.alab.m{color:#8FE3EA;border:1px solid rgba(143,227,234,.4);background:rgba(8,16,18,.86)}
+.scalebar{position:absolute;right:12px;bottom:11px;display:flex;align-items:center;gap:7px;color:#9DB6B9}
+.scalebar .bar{height:2px;background:#9DB6B9;border-radius:1px;display:block}
+.scalebar em{font-style:normal;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px}
+.repbar{position:absolute;left:12px;bottom:11px;display:flex;gap:2px;padding:2px;border-radius:8px;
+  background:rgba(12,22,25,.72);border:1px solid rgba(140,175,180,.24);backdrop-filter:blur(6px)}
+.repbar button{border:0;background:0;color:#C7D8D9;font-size:10.5px;padding:4px 9px;border-radius:6px;
+  cursor:pointer;font-family:inherit;white-space:nowrap}
+.repbar button:hover{color:#fff}
+.repbar button.on{background:var(--accent);color:#04191C;font-weight:600}
+.vp-note{position:absolute;right:12px;bottom:12px;font-size:10px;color:#6C8A90;letter-spacing:.02em}
+.vp-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  color:#7C9AA0;font-size:13px;padding:30px;pointer-events:none}
+
+/* build stack */
+.stack{display:flex;align-items:center;gap:7px;padding:9px 11px;border-top:1px solid var(--line);
+  background:var(--panel);flex-wrap:wrap}
+.stack>span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 5px 4px 8px;border-radius:100px;
+  border:1px solid var(--line);background:var(--panel-2);font-size:11.5px;cursor:pointer}
+.chip:hover{border-color:var(--line-2)}
+.chip.on{border-color:var(--accent);background:var(--accent-wash);color:var(--accent)}
+.chip i{width:8px;height:8px;border-radius:50%;display:block}
+.chip b{font-weight:500}
+.chip .x{border:0;background:0;color:var(--ink-3);cursor:pointer;padding:0 3px;line-height:1;font-size:13px;border-radius:50%}
+.chip .x:hover{color:var(--fail)}
+.chip.empty{border-style:dashed;color:var(--ink-3);cursor:default}
+.stack .arw{color:var(--line-2);font-size:11px}
+
+/* ---------- inspector ---------- */
+.insp{padding:11px 12px;display:flex;flex-direction:column;gap:12px}
+.sel-head{display:flex;gap:9px;align-items:flex-start}
+.sel-head .sw{width:30px;height:30px;border-radius:7px;flex:none;display:grid;place-items:center;
+  color:#fff;font-size:10px;font-weight:600}
+.sel-head h3{font-size:14.5px;letter-spacing:-.015em}
+.sel-head p{margin:1px 0 0;font-size:11px;color:var(--ink-3);letter-spacing:.05em;text-transform:uppercase}
+.elkey{display:flex;gap:11px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-2);
+  padding:7px 8px;border:1px solid var(--line);border-radius:7px;background:var(--sunk)}
+.elkey i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:-1px}
+.seq{background:var(--sunk);border:1px solid var(--line);border-radius:7px;padding:7px 8px;
+  font-size:11px;line-height:1.6;word-break:break-all;color:var(--ink-2)}
+.seq b{color:var(--ink);font-weight:600}
+.seq .cys{color:var(--warn);font-weight:600}
+.facts{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.fact{display:flex;justify-content:space-between;gap:10px;padding:5.5px 1px;border-bottom:1px solid var(--line);font-size:11.5px}
+.fact dt{color:var(--ink-3)}
+.fact dd{margin:0;text-align:right;color:var(--ink);font-size:11px}
+.blurb{font-size:11.5px;color:var(--ink-2);line-height:1.5}
+.ctl{display:flex;flex-direction:column;gap:5px}
+.ctl-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px}
+.ctl-h b{font-weight:500;color:var(--ink-2)}
+.ctl-h .v{font-size:11.5px;color:var(--ink);font-weight:500}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;border-radius:3px;
+  background:var(--line-2);outline-offset:5px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+  background:var(--accent);border:2.5px solid var(--panel);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--accent);
+  border:2.5px solid var(--panel);box-shadow:0 0 0 1px var(--accent);cursor:pointer}
+.hint{font-size:10.5px;color:var(--ink-3);line-height:1.4}
+.linkb{background:0;border:0;padding:0;color:var(--accent);text-decoration:underline;
+  cursor:pointer;font-size:10.5px;font-family:inherit}
+.btn{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--accent);
+  background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.01em}
+.btn:hover{background:var(--accent-2);border-color:var(--accent-2)}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn.ghost{background:0;color:var(--ink-2);border-color:var(--line);font-weight:500}
+.btn.ghost:hover{background:var(--panel-2);color:var(--ink);border-color:var(--line-2)}
+.rowbtn{display:grid;grid-template-columns:1fr auto;gap:7px}
+
+/* gates */
+.gates{display:flex;flex-direction:column;gap:5px}
+.gate{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;
+  padding:6px 8px;border-radius:7px;background:var(--panel-2);border:1px solid var(--line);font-size:11.5px}
+.gate .ic{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;
+  font-size:10px;font-weight:700;color:#fff}
+.gate .lb{line-height:1.25}
+.gate .lb em{display:block;font-style:normal;font-size:10px;color:var(--ink-3)}
+.gate .vl{font-size:11px;font-weight:500}
+.g-pass .ic{background:var(--pass)} .g-pass .vl{color:var(--pass)}
+.g-warn .ic{background:var(--warn)} .g-warn .vl{color:var(--warn)}
+.g-fail .ic{background:var(--fail)} .g-fail .vl{color:var(--fail)}
+
+/* ---------- results ---------- */
+.results{margin-top:13px;background:var(--panel);border:1px solid var(--line);border-radius:11px}
+.res-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid var(--line)}
+.res-h h2{font-size:13px;letter-spacing:-.01em}
+.res-h .stamp{font-size:10.5px;color:var(--ink-3);letter-spacing:.04em}
+.res-h .right{margin-left:auto;display:flex;gap:7px;align-items:center}
+.tabs{display:flex;gap:2px;background:var(--sunk);padding:2px;border-radius:8px;border:1px solid var(--line)}
+.tab{border:0;background:0;padding:4px 11px;border-radius:6px;font-size:11.5px;cursor:pointer;color:var(--ink-3)}
+.tab:hover{color:var(--ink)}
+.tab.on{background:var(--panel);color:var(--ink);font-weight:500;box-shadow:var(--shadow)}
+.res-b{padding:13px 14px 15px}
+.pane{display:none} .pane.on{display:block}
+
+/* ranked table */
+.rank{display:flex;flex-direction:column;gap:2px}
+.rk-head,.rk{display:grid;grid-template-columns:26px minmax(120px,1.25fr) 1.5fr 64px 64px 78px 90px;
+  gap:10px;align-items:center}
+.rk-head{padding:0 9px 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  border-bottom:1px solid var(--line)}
+.rk-head .n{text-align:right}
+.rk{padding:8px 9px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background .12s}
+.rk:hover{background:var(--panel-2)}
+.rk.on{background:var(--accent-wash);border-color:var(--accent)}
+.rk .pos{font-size:11px;color:var(--ink-3);font-weight:600}
+.rk.top .pos{color:var(--accent)}
+.rk .who{display:flex;align-items:center;gap:8px;min-width:0}
+.rk .who i{width:9px;height:9px;border-radius:2.5px;flex:none}
+.rk .who .t{min-width:0}
+.rk .who b{display:block;font-size:12.5px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.rk .who em{font-style:normal;font-size:10px;color:var(--ink-3);letter-spacing:.02em}
+.rk .n{text-align:right;font-size:12px}
+.rk .n small{display:block;font-size:9.5px;color:var(--ink-3);letter-spacing:.02em}
+.ctrl-row{opacity:.72}
+.tagc{display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line-2);color:var(--ink-3);border-radius:4px;padding:0 4px;margin-left:5px;vertical-align:1px}
+
+/* meter */
+.meter{position:relative;height:15px;border-radius:3px;background:var(--sunk);overflow:visible}
+.meter .fill{position:absolute;left:0;top:0;bottom:0;border-radius:2px 4px 4px 2px;min-width:3px}
+.meter .tickmark{position:absolute;top:-3px;bottom:-3px;width:1.5px;background:var(--line-2);border-radius:1px}
+.meter-cell{display:flex;align-items:center;gap:10px}
+.meter-cell .meter{flex:1;min-width:60px}
+.mv{font-size:11px;width:34px;text-align:right;color:var(--ink-2);flex:none}
+
+/* callout */
+.callout{margin-top:13px;display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;
+  padding:11px 13px;border-radius:9px;background:var(--accent-wash);border:1px solid var(--line)}
+.callout .k{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent);
+  white-space:nowrap;padding-top:1px;font-weight:600}
+.callout p{margin:0;font-size:12px;line-height:1.5;color:var(--ink-2)}
+.callout b{color:var(--ink);font-weight:600}
+
+/* charts */
+.chart-wrap{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+.ch-t{font-size:12px;font-weight:600;letter-spacing:-.01em}
+.ch-s{font-size:10.5px;color:var(--ink-3);margin:1px 0 9px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-2)}
+.lg i{width:14px;height:2.5px;border-radius:2px;display:block}
+.lg i.sq{width:9px;height:9px;border-radius:2.5px}
+svg.plot{display:block;width:100%;height:auto;overflow:visible}
+svg.plot text{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--panel);border:1px solid var(--line-2);
+  border-radius:7px;padding:6px 9px;font-size:11px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;
+  max-width:230px;line-height:1.45}
+.tip.on{opacity:1}
+.tip b{font-weight:600} .tip .row{display:flex;gap:9px;justify-content:space-between;align-items:center}
+.tip i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:5px}
+
+/* dossier */
+.doss{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:11px}
+.dcard{border:1px solid var(--line);border-radius:9px;padding:11px 12px;background:var(--panel-2)}
+.dcard h4{margin:0 0 7px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.dcard ol,.dcard ul{margin:0;padding-left:16px;font-size:11.5px;color:var(--ink-2);line-height:1.6}
+.dcard li::marker{color:var(--ink-3)}
+.dcard .big{font-size:23px;font-weight:600;letter-spacing:-.025em;color:var(--ink);line-height:1.1}
+.dcard .big small{font-size:11px;color:var(--ink-3);font-weight:400;letter-spacing:0}
+.foot{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:baseline;
+  margin-top:16px;padding-top:11px;border-top:1px solid var(--line);font-size:10.5px;color:var(--ink-3)}
+.foot a{color:var(--ink-2)}
+.banner{display:flex;gap:9px;align-items:baseline;padding:8px 12px;margin-bottom:13px;border-radius:8px;
+  background:var(--panel);border:1px solid var(--line);font-size:11.5px;color:var(--ink-2)}
+.banner b{color:var(--ink);font-weight:600;letter-spacing:.02em;font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;white-space:nowrap}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;
+  border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media (max-width:1180px){
+  .work{grid-template-columns:230px minmax(0,1fr);align-items:start}
+  .rail-b{max-height:430px}
+  .rail.insp-rail{grid-column:1/-1}
+  .insp{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:13px;align-items:start}
+  .chart-wrap{grid-template-columns:1fr}
+}
+@media (max-width:860px){
+  .work{grid-template-columns:1fr}
+  .rk-head{display:none}
+  .rk{grid-template-columns:24px 1fr 1fr;row-gap:5px}
+  .rk .n{text-align:left}
+}
+</style>
+<style>
+.sub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;
+  border-top:1px solid var(--line);padding-top:11px;margin-bottom:-3px}
+.sub:first-child{border-top:0;padding-top:0}
+.verd{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:2.5px 7px;
+  border-radius:100px;border:1px solid;white-space:nowrap;display:inline-block}
+.v-adv{color:var(--pass);border-color:var(--pass);background:color-mix(in srgb,var(--pass) 11%,transparent)}
+.v-hold{color:var(--warn);border-color:var(--warn);background:color-mix(in srgb,var(--warn) 11%,transparent)}
+.v-drop{color:var(--fail);border-color:var(--fail);background:color-mix(in srgb,var(--fail) 11%,transparent)}
+.v-ctrl{color:var(--ink-3);border-color:var(--line-2)}
+.stat{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-bottom:1px solid var(--line)}
+.stat:last-child{border-bottom:0}
+.stat .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.stat .v{font-size:19px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.stat .v small{font-size:11px;color:var(--ink-3);font-weight:400;letter-spacing:0;margin-left:2px}
+.stat .d{font-size:10.5px;color:var(--ink-3);line-height:1.4}
+</style>
+
+<div class="shell">
+<header class="top">
+  <div class="brand"><b>MOFlect</b><i class="dot"></i><span>NanoCompass Technologies</span></div>
+  <nav class="crumbs" aria-label="Workflow stage">
+    <span class="crumb on"><i>01</i>Design</span><span class="sep">&rarr;</span>
+    <span class="crumb on"><i>02</i>Screen</span><span class="sep">&rarr;</span>
+    <span class="crumb on"><i>03</i>Shortlist</span><span class="sep">&rarr;</span>
+    <span class="crumb"><i>04</i>Wet lab</span>
+  </nav>
+  <div class="right">
+    <span class="proj">Project <b>HER2&#8209;01</b> &middot; fluorescein@ZIF&#8209;8/PDA</span>
+    <button class="iconbtn" id="theme" type="button">Light / dark</button>
+  </div>
+</header>
+
+<div class="banner">
+  <b>Demo build</b>
+  <span>Scores come from a pre-programmed model anchored on the HER2/ZIF&#8209;8 case study &mdash; interface
+  retention for P51, AHNP&#8209;GC and CGLTVSPWY is fixed at the values measured in the surface-aware MD
+  campaign (0.264 / 0.487 / 0.666), and the sliders interpolate around them. No live simulation runs in this page.</span>
+</div>
+
+<div class="work">
+  <!-- ============ component library ============ -->
+  <aside class="rail">
+    <div class="rail-h"><h2>Components</h2><em>drag &rarr; stage</em></div>
+    <div class="rail-b" id="lib"></div>
+  </aside>
+
+  <!-- ============ 3D stage ============ -->
+  <section class="stage">
+    <div class="vp" id="vp">
+      <div class="vp-hud">
+        <div class="vp-title">Construct</div>
+        <div class="vp-name" id="vp-name">S3&#8209;CGLTVSPWY</div>
+        <div class="legend3d" id="legend3d"></div>
+      </div>
+      <div class="vp-tools">
+        <button class="tool" type="button" data-t="site">Site</button>
+        <button class="tool on" type="button" data-t="her2">HER2</button>
+        <button class="tool on" type="button" data-t="cargo">Cargo</button>
+        <button class="tool" type="button" data-t="cut">Cutaway</button>
+        <button class="tool on" type="button" data-t="spin">Spin</button>
+      </div>
+      <div class="repbar" id="repbar">
+        <button type="button" data-r="solid">Solid</button>
+        <button type="button" data-r="fill">vdW</button>
+        <button type="button" class="on" data-r="bs">Ball &amp; stick</button>
+        <button type="button" data-r="stick">Stick</button>
+      </div>
+      <div class="labels" id="labels"></div>
+      <div class="scalebar" id="scalebar" hidden><span class="bar"></span><em>5 Å</em></div>
+      <div class="vp-note" id="vp-note">Drag to orbit &middot; scroll to zoom &middot; click a Cys anchor to inspect the bond</div>
+    </div>
+    <div class="stack" id="stack"></div>
+  </section>
+
+  <!-- ============ inspector ============ -->
+  <aside class="rail insp-rail">
+    <div class="rail-h"><h2>Inspector</h2><em id="insp-kind">&mdash;</em></div>
+    <div class="insp">
+      <div id="insp-body"></div>
+
+      <div class="sub">Design parameters</div>
+      <div class="ctl">
+        <div class="ctl-h"><b>Peptide surface density</b><span class="v mono" id="v-dens">1.2%</span></div>
+        <input type="range" id="p-dens" min="0.2" max="6" step="0.1" value="1.2" aria-label="Peptide surface density, percent of sites">
+        <div class="hint" id="h-dens"></div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-h"><b>Spacer length</b><span class="v mono" id="v-link">1.2 nm</span></div>
+        <input type="range" id="p-link" min="0" max="3.5" step="0.1" value="1.2" aria-label="Spacer length in nanometres">
+        <div class="hint" id="h-link"></div>
+      </div>
+      <div class="ctl">
+        <div class="ctl-h"><b>PDA shell thickness</b><span class="v mono" id="v-shell">8 nm</span></div>
+        <input type="range" id="p-shell" min="2" max="20" step="1" value="8" aria-label="Polydopamine shell thickness in nanometres">
+      </div>
+      <div class="ctl">
+        <div class="ctl-h"><b>Carrier diameter</b><span class="v mono" id="v-dia">180 nm</span></div>
+        <input type="range" id="p-dia" min="60" max="2000" step="10" value="180" aria-label="Carrier diameter in nanometres">
+        <div class="hint" id="h-dia"></div>
+      </div>
+
+      <div class="sub">Feasibility gates</div>
+      <div class="gates" id="gates"></div>
+
+      <div class="rowbtn">
+        <button class="btn" id="run" type="button">Run screen</button>
+        <button class="btn ghost" id="reset" type="button" style="width:auto;padding:9px 13px">Reset</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ results ============ -->
+<section class="results">
+  <div class="res-h">
+    <h2>Screening output</h2>
+    <span class="stamp mono" id="stamp"></span>
+    <div class="right">
+      <div class="tabs" role="tablist">
+        <button class="tab on" type="button" data-p="rank" role="tab">Ranked shortlist</button>
+        <button class="tab" type="button" data-p="rel" role="tab">pH release</button>
+        <button class="tab" type="button" data-p="doss" role="tab">Design dossier</button>
+      </div>
+    </div>
+  </div>
+  <div class="res-b">
+    <div class="pane on" id="pane-rank">
+      <div class="rank">
+        <div class="rk-head">
+          <div>#</div><div>Surface&#8209;modification design</div>
+          <div>Predicted HER2 presentation &nbsp;<span style="text-transform:none;letter-spacing:0">(Q<sub>HER2</sub>)</span></div>
+          <div class="n">Access.</div><div class="n">Loading</div><div class="n">Score</div><div class="n">Call</div>
+        </div>
+        <div id="rank"></div>
+      </div>
+      <p style="margin:9px 2px 0;font-size:10.5px;color:var(--ink-3)">
+        Bars run 0 to 1.0; the upright mark is 0.50, below which the modelled contact pattern is
+        more lost than kept. Values for the three targeting designs are anchored on measured medians.</p>
+      <div class="callout">
+        <div class="k">Recommended</div>
+        <p id="reco"></p>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-rel">
+      <div class="chart-wrap">
+        <div>
+          <div class="ch-t">Cumulative fluorescein release</div>
+          <div class="ch-s" id="rel-sub"></div>
+          <div class="legend">
+            <span class="lg"><i style="background:var(--r50)"></i>pH 5.0 &middot; endosomal</span>
+            <span class="lg"><i style="background:var(--r74)"></i>pH 7.4 &middot; physiological</span>
+          </div>
+          <svg class="plot" id="relsvg" viewBox="0 0 620 300" role="img" aria-label="Cumulative fluorescein release over 48 hours at pH 5.0 and pH 7.4"></svg>
+        </div>
+        <div>
+          <div class="stat"><span class="k">Release selectivity</span>
+            <span class="v mono" id="s-sel"></span>
+            <span class="d">Ratio of cumulative release at pH&nbsp;5.0 to pH&nbsp;7.4 at 24&nbsp;h. Above 4&times; is the
+            working target for acid-triggered ZIF&#8209;8 cargo.</span></div>
+          <div class="stat"><span class="k">Cargo retained at 8 h, pH 7.4</span>
+            <span class="v mono" id="s-leak"></span>
+            <span class="d">Off-target leakage during circulation.</span></div>
+          <div class="stat"><span class="k">Predicted peptide loading</span>
+            <span class="v mono" id="s-load"></span>
+            <span class="d">A280 depletion equivalent, reported per mg of carrier.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-doss">
+      <div class="doss" id="doss"></div>
+    </div>
+  </div>
+</section>
+
+<div class="foot">
+  <span>MOFlect &middot; surface-aware design screen for targeted MOF carriers. Interface-retention values from the
+  HER2/ZIF&#8209;8&#8211;PDA study; all other figures are modelled for demonstration.</span>
+  <span class="mono">build 0.3 &middot; demo</span>
+</div>
+</div>
+<div class="tip" id="tip"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt=(v,d=2)=>v.toFixed(d);
+const fmtDia=v=>v>=1000?(v/1000).toFixed(2)+' \u00b5m':v+' nm';
+
+/* ================= catalog ================= */
+const CAT={
+carrier:{label:'MOF carrier',items:[
+ {id:'zif8',name:'ZIF-8',tag:'ZIF',meta:'Zn(mIm)₂ · sodalite · acid-labile',color:'--zif',
+  pres:1.00,release:1.00,rmax:88,
+  facts:[['Framework','Zn²⁺ + 2-methylimidazolate'],['Crystal habit','Rhombic dodecahedron'],
+   ['Aperture','0.34 nm'],['Lattice','a = 16.99 Å, sodalite net'],['Acid stability','Dissolves below pH ≈ 6'],['Measured S1 batch','0.5–2 µm faceted polyhedra']],
+  blurb:'The case-study carrier. The acid-labile framework supplies the pH switch, and the {110} rhombic dodecahedral habit is what the SEM of S1 actually shows.'},
+ {id:'uio66',name:'UiO-66',tag:'UiO',meta:'Zr₆O₄ · rigid · acid-stable',color:'--zif',
+  pres:0.98,release:0.40,rmax:38,
+  facts:[['Framework','Zr₆O₄(OH)₄ + terephthalate'],['Crystal habit','Octahedral'],['Aperture','0.60 nm'],
+   ['Acid stability','Stable to pH 1'],['Trade-off','Poor pH-triggered release']],
+  blurb:'Far more robust than ZIF-8, which is exactly the problem for an acid-triggered payload: it holds cargo at endosomal pH.'},
+ {id:'mil101',name:'MIL-101(Fe)',tag:'MIL',meta:'Fe₃O · mesoporous · high load',color:'--zif',
+  pres:0.95,release:0.70,rmax:64,
+  facts:[['Framework','Fe₃O trimer + terephthalate'],['Crystal habit','Truncated octahedron'],
+   ['Aperture','1.2 / 1.6 nm cages'],['Extra','Fe gives MRI contrast'],['Trade-off','Rougher surface for tethering']],
+  blurb:'Mesoporous cages take a much larger payload and the iron centres are MRI-active, at the cost of a rougher surface for uniform peptide presentation.'}]},
+
+coating:{label:'Surface / attachment layer',items:[
+ {id:'pda',name:'Polydopamine',tag:'PDA',meta:'quinone · thiol-reactive',color:'--pda',anchor:1.00,
+  facts:[['Chemistry','Michael addition / Schiff base'],['Reactive group','o-quinone'],['Handle needed','Free cysteine thiol'],
+   ['Deposition','Dopamine·HCl, Tris pH 8.5'],['Measured nodules','64–195 nm, median 84 nm'],['Coverage','Patchy — edges and part of the face']],
+  blurb:'Mussel-inspired layer whose quinones react with cysteine thiols in mild buffer, so no separate linker chemistry is needed. SEM of S3 shows deposition concentrated at the crystal edges with substantial free PDA alongside, so the material is PDA-decorated rather than a proven continuous core–shell.'},
+ {id:'peg',name:'PEG-silane',tag:'PEG',meta:'stealth · no covalent handle',color:'--pda',anchor:0.62,
+  facts:[['Chemistry','Silane condensation'],['Reactive group','Terminal –OH / –OMe'],['Handle needed','Separate NHS or maleimide step'],
+   ['Benefit','Lowest protein-corona adsorption'],['Trade-off','Extra conjugation step']],
+  blurb:'Best circulation profile of the three, but peptides need a second activation step, and every extra step costs yield.'},
+ {id:'ha',name:'Hyaluronic acid',tag:'HA',meta:'CD44-active · carboxylate',color:'--pda',anchor:0.78,
+  facts:[['Chemistry','EDC/NHS amidation'],['Reactive group','Carboxylate'],['Handle needed','Peptide N-terminus or Lys'],
+   ['Benefit','Adds CD44 targeting'],['Trade-off','Competes with the HER2 route']],
+  blurb:'Brings its own CD44 tropism, which can help uptake but muddies attribution when HER2 selectivity is the endpoint.'}]},
+
+cargo:{label:'Model cargo',items:[
+ {id:'flu',name:'Fluorescein',tag:'FLU',meta:'490/514 nm · model payload',color:'--flu',
+  facts:[['Role','Measurable model cargo'],['Excitation / emission','490 / 514 nm'],['Readout','Particle-associated fluorescence'],
+   ['Caution','Emission is pH-dependent'],['Not','A therapeutic agent']],
+  blurb:'Stands in for a drug so release and recognition can be read optically. Acidic aliquots have to be brought back to a common pH before the plate is read.'},
+ {id:'dox',name:'Doxorubicin',tag:'DOX',meta:'therapeutic · 480/590 nm',color:'--flu',
+  facts:[['Role','Therapeutic anthracycline'],['Excitation / emission','480 / 590 nm'],['Loading','π-stacking in the pore'],
+   ['Benefit','Direct cytotoxicity endpoint'],['Caution','Handling and disposal controls']],
+  blurb:'Moves the readout from model cargo to a real cytotoxic payload, which is the step after the fluorescein comparison closes.'}]},
+
+peptide:{label:'Targeting peptide',items:[
+ {id:'cglt',name:'CGLTVSPWY',tag:'CGL',meta:'9 residues · N-term Cys-Gly handle',color:'--s1',
+  seq:'CGLTVSPWY',n:9,baseQ:0.666,iqr:'0.606–0.688',handleQ:1.00,mw:1024,anchorIdx:0,
+  handle:'Engineered N-terminal Cys-Gly handle',
+  facts:[['Sequence','CGLTVSPWY'],['Parent','LTVSPWY (phage-display)'],['Attachment','Cys1 thiol, N-terminal'],
+   ['Measured Qₕₑᵣ₂','0.666 [0.606–0.688]'],['Configurations','6 across 3 PDA packings']],
+  blurb:'Shortest of the three and the best behaved near PDA: the engineered Cys-Gly handle keeps the LTVSPWY recognition face pointing away from the surface.'},
+ {id:'ahnp',name:'AHNP-GC',tag:'AHN',meta:'14 residues · C-term Gly-Cys handle',color:'--s2',
+  seq:'YCDGFYACYMDVGC',n:14,baseQ:0.487,iqr:'0.438–0.513',handleQ:0.97,mw:1563,anchorIdx:13,
+  handle:'C-terminal Gly-Cys handle, Cys2–Cys8 disulfide retained',
+  facts:[['Sequence','YCDGFYACYMDVGC'],['Parent','AHNP (trastuzumab mimetic)'],['Attachment','Cys14, C-terminal'],
+   ['Measured Qₕₑᵣ₂','0.487 [0.438–0.513]'],['Structural','Cys2–Cys8 disulfide must survive']],
+  blurb:'Cyclic mimetic of the trastuzumab CDR loop. The rebuilt design keeps the structural disulfide and adds a separate terminal handle, so attachment does not open the ring.'},
+ {id:'p51',name:'P51',tag:'P51',meta:'17 residues · native Cys1',color:'--s3',
+  seq:'CDTFPYLGWWNPNEYRY',n:17,baseQ:0.264,iqr:'0.222–0.290',handleQ:0.92,mw:2158,anchorIdx:0,
+  handle:'Native N-terminal Cys1',
+  facts:[['Sequence','CDTFPYLGWWNPNEYRY'],['Parent','P51 (computational screen)'],['Attachment','Native Cys1'],
+   ['Measured Qₕₑᵣ₂','0.264 [0.222–0.290]'],['Configurations','4 across 3 PDA packings']],
+  blurb:'Strong on paper and on liposomes, weakest here. The long chain folds back toward PDA and the recognition face is lost first — the case for screening presentation, not sequence.'},
+ {id:'scr',name:'Scrambled P51',tag:'SCR',meta:'control · matched composition',color:'--s4',control:true,
+  seq:'CGYPNLWTREYFWPNYD',n:17,baseQ:0.09,iqr:'—',handleQ:0.90,mw:2158,anchorIdx:0,
+  handle:'Cys1 retained for matched attachment chemistry',
+  facts:[['Sequence','CGYPNLWTREYFWPNYD'],['Role','Nonspecific-functionalisation control'],['Attachment','Cys1'],
+   ['Composition','Identical to P51'],['Expectation','Signal at background']],
+  blurb:'Same amino acids, same attachment chemistry, scrambled order. Whatever signal this carrier produces is the floor every targeting design has to clear.'}]}
+};
+const find=(k,id)=>CAT[k].items.find(i=>i.id===id);
+const PEPS=CAT.peptide.items;
+
+/* ================= state ================= */
+const S={carrier:'zif8',coating:'pda',cargo:'flu',peptide:'cglt',
+  dens:1.2,link:1.2,shell:8,dia:180,
+  sel:{kind:'peptide',id:'cglt'},
+  mode:'particle',siteIdx:0,rep:'bs',
+  show:{her2:true,cargo:true,cut:false,spin:true},tab:'rank'};
+
+/* ================= model ================= */
+function evalDesign(pid){
+  const p=find('peptide',pid), car=find('carrier',S.carrier), coat=find('coating',S.coating);
+  if(!p) return {p:{id:null,name:'Peptide-free',n:0,handle:'no peptide attached',control:true,
+    color:'--s4',iqr:'\u2014'},Q:0,A:0,F:0,load:0,score:0,sel:1,fLink:1,fCrowd:1,fShell:1};
+  const L=S.link, d=S.dens, t=S.shell;
+  const fLink=clamp(1-0.40*Math.pow((L-1.3)/1.9,2),0.2,1);
+  const fCrowd=clamp(1-0.30*Math.pow(Math.max(0,d-1.3)/3.5,1.6),0.4,1);
+  const fShell=clamp(1-clamp((t-6)/28,0,1)*(1-Math.min(1,L/1.6)),0.35,1);
+  const Q=clamp(p.baseQ*fLink*fCrowd*fShell*coat.anchor*car.pres,0.02,0.97);
+  const lenF=clamp(1.10-0.020*(p.n-9),0.55,1.10);   // longer chains fold back more readily
+  const relQ=p.baseQ/0.666;
+  const A=clamp((0.42+0.58*fLink*fShell)*(0.72+0.28*fCrowd)*Math.pow(coat.anchor,0.6)
+    *(0.62+0.38*relQ)*lenF,0.05,0.97);
+  const F=clamp(coat.anchor*p.handleQ*(0.82+0.18*fShell),0.05,1);
+  const SA=6/(0.95*(S.dia/1000));                  // m2 per g
+  const foot=clamp(1.15-0.014*p.n,0.70,1.10);      // bulkier peptides pack less densely
+  const load=SA*(d/100)*1.6605*F*foot;             // nmol per mg
+  const score=100*(0.46*clamp(Q/0.70,0,1)+0.28*A+0.16*F+0.10*clamp(load/3,0,1));
+  const sel=clamp(1-0.42*Math.pow(Math.max(0,d-1.3)/3.5,1.3),0.3,1); // HER2+ vs HER2- margin
+  return {p,Q,A,F,load,score,sel,fLink,fCrowd,fShell};
+}
+function gates(){
+  const p=find('peptide',S.peptide), coat=find('coating',S.coating), r=evalDesign(S.peptide);
+  const sep=clamp(0.34-0.019*Math.max(0,S.dens-1.0)+0.03*S.link,0.05,0.6);
+  const burial=Math.round(clamp(7+2.4*Math.max(0,S.dens-1.0)+0.42*Math.max(0,S.shell-6)-3.2*S.link,1,34));
+  const anchorOK=coat.anchor>=0.9;
+  const cysD=anchorOK?0.30:(coat.anchor>=0.7?0.38:0.52);
+  return [
+   {k:'Steric clearance',sub:'min heavy-atom separation ≥ 0.20 nm',v:fmt(sep,2)+' nm',
+    st:sep>=0.20?'pass':(sep>=0.17?'warn':'fail')},
+   {k:'Recognition face exposed',sub:'contact residues clear of the surface',v:Math.round(r.A*100)+'%',
+    st:r.A>=0.55?'pass':(r.A>=0.40?'warn':'fail')},
+   {k:'Local burial',sub:'≤ 15 PDA heavy atoms within 0.60 nm',v:burial+' atoms',
+    st:burial<=15?'pass':(burial<=21?'warn':'fail')},
+   {k:'Cys–anchor geometry',sub:'S–anchor distance 0.25–0.35 nm',v:fmt(cysD,2)+' nm',
+    st:(cysD>=0.25&&cysD<=0.35)?'pass':(cysD<=0.42?'warn':'fail')}];
+}
+function releaseCurves(){
+  const car=find('carrier',S.carrier), sh=clamp((S.shell-2)/18,0,1);
+  const T=[0,0.5,1,2,4,8,24,48];
+  const k5=0.30*(1-0.34*sh)*(0.5+0.5*car.release), k7=0.055*(1-0.45*sh);
+  const m5=car.rmax*(1-0.10*sh), m7=16*(1-0.30*sh);
+  return {T,a:T.map(t=>m5*(1-Math.exp(-k5*t))),b:T.map(t=>m7*(1-Math.exp(-k7*t)))};
+}
+
+/* ================= library rail ================= */
+function swatch(it,k){
+  const c=k==='peptide'?`var(${it.color})`:`var(${it.color})`;
+  return `<span class="sw" style="background:${c}">${it.tag}</span>`;
+}
+function renderLib(){
+  $('#lib').innerHTML=Object.entries(CAT).map(([k,g])=>`
+   <div class="grp"><h3>${g.label}</h3><div class="items">
+   ${g.items.map(it=>`<div class="lib${S[k]===it.id?' on':''}" role="button" tabindex="0" draggable="true"
+      data-kind="${k}" data-id="${it.id}" aria-label="${it.name}">
+      ${swatch(it,k)}<span><span class="nm">${it.name}</span><span class="mt">${it.meta}</span></span>
+    </div>`).join('')}
+   </div></div>`).join('');
+}
+function renderStack(){
+  const order=[['carrier','Carrier'],['coating','Layer'],['cargo','Cargo'],['peptide','Peptide']];
+  $('#stack').innerHTML='<span>Build</span>'+order.map(([k,lbl],i)=>{
+    const it=find(k,S[k]); const on=S.sel.kind===k;
+    const arrow=i<order.length-1?'<span class="arw">›</span>':'';
+    if(!it) return `<span class="chip empty">${lbl}</span>${arrow}`;
+    return `<span class="chip${on?' on':''}" data-kind="${k}" data-id="${it.id}" tabindex="0" role="button">
+      <i style="background:var(${it.color})"></i><b>${it.name}</b>
+      ${k==='peptide'?`<button class="x" data-clear="peptide" title="Remove peptide" aria-label="Remove peptide">×</button>`:''}
+      </span>${arrow}`;
+  }).join('');
+  const p=find('peptide',S.peptide);
+  $('#vp-name').textContent=S.mode==='site'
+    ? (p?('Cys–PDA site · '+p.name):'Attachment site')
+    : (p?('S3-'+p.name):'S3-unmodified');
+  const el3=(n,c)=>`<span class="l3"><i style="background:${c}"></i>${n}</span>`;
+  const rows=[];
+  rows.push(S.rep!=='solid'
+    ? `<span class="l3"><i style="background:#5FC078"></i><i style="background:#8FA6F0"></i>`+
+      `<i style="background:#B8B054"></i><i style="background:#EFEFF6"></i>`+
+      `${find('carrier',S.carrier).name} framework &middot; Zn N C H</span>`
+    : el3(find('carrier',S.carrier).name,'var(--zif)'));
+  rows.push(el3(find('coating',S.coating).name+' deposits','var(--pda)'));
+  if(S.freePDA) rows.push(el3('free '+find('coating',S.coating).tag+' aggregates','var(--pda)'));
+  if(S.show.cargo) rows.push(el3(find('cargo',S.cargo).name,'var(--flu)'));
+  if(p) rows.push(el3(p.name,`var(${p.color})`));
+  if(S.show.her2) rows.push(el3('HER2 ectodomain','#74B389'));
+  $('#legend3d').innerHTML=rows.join('');
+}
+</script>
+<script>
+/* ================= inspector ================= */
+function seqHTML(p){
+  return [...p.seq].map((ch,i)=>{
+    const anchor=i===p.anchorIdx;
+    if(ch==='C') return `<span class="cys">${anchor?`<b style="text-decoration:underline">${ch}</b>`:ch}</span>`;
+    return anchor?`<b>${ch}</b>`:ch;
+  }).join('');
+}
+const coverage=()=>Math.round(clamp(22+S.shell*3.5,16,94));
+function dynFacts(kind,it){
+  if(kind==='carrier') return [['Set diameter',fmtDia(S.dia)],
+    ['Shown',S.fwStats?`${S.fwStats.atoms} atoms · ${S.fwStats.link} linkers`:'solid habit']];
+  if(kind==='coating') return [['Modelled coverage',coverage()+'% of the core surface'],
+    ['Free '+it.tag,S.freePDA?'present at this loading':'negligible at this loading']];
+  return [];
+}
+function siteChem(){
+  const p=find('peptide',S.peptide); if(!p) return null;
+  const r=evalDesign(S.peptide);
+  const cnt=set=>[...p.seq].filter(ch=>set.includes(ch)).length;
+  return {p,r,arom:cnt('FWY'),hpho:cnt('AVLIMFWPY'),pol:cnt('STNQYCHKRDE'),
+    nRef:Math.round(9+p.n*2.4),nCh:Math.round(clamp(6+S.dens*4.6,5,32))};
+}
+function renderSiteInsp(){
+  $('#insp-kind').textContent='Attachment site';
+  const c=siteChem();
+  if(!c){ $('#insp-body').innerHTML='<p class="blurb">No peptide is attached to this carrier.</p>'; return; }
+  const g=gates().find(x=>x.k.indexOf('Cys')===0), nRet=Math.round(c.nRef*c.r.Q);
+  const row=(k,v)=>`<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`;
+  $('#insp-body').innerHTML=`
+    <div class="sel-head">
+      <span class="sw" style="background:${ELCOL.S};color:#3A2E10">Sγ</span>
+      <div><h3>Cys–PDA adduct</h3><p>${c.p.name} &middot; site ${S.siteIdx+1} of ${c.nCh}</p></div>
+    </div>
+    <div class="elkey">${['Zn','N','C','O','S'].map(e=>
+      `<span><i style="background:${ELCOL[e]}"></i>${e}</span>`).join('')}</div>
+    <dl class="facts">
+      ${row('Reactive unit','Indole-5,6-quinone (DHI)')}
+      ${row('Bond formed','Cys Sγ–C4 thioether')}
+      ${row('Sγ–C length','1.82 Å')}
+      ${row('Quinone C=O','1.22 Å')}
+      ${row('Conditions','10 mM HEPES pH 7.0, 5 h, dark')}
+    </dl>
+    <div class="sub" style="margin-top:2px">Binding stability</div>
+    <dl class="facts">
+      ${row('Interface retention','<b>'+fmt(c.r.Q,3)+'</b> at 5 ns')}
+      ${row('Contacts kept',nRet+' of '+c.nRef+' reference pairs')}
+      ${row('Hydrophobic residues',c.hpho)}
+      ${row('H-bond capable',c.pol)}
+      ${row('Aromatic (π-stacking)',c.arom)}
+      ${row('MD restraint','3.00 Å, k = 1000 kJ mol⁻¹ nm⁻²')}
+      ${row('Geometry gate','<span style="color:var(--'+(g.st==='pass'?'pass':g.st==='warn'?'warn':'fail')+')">'+g.v+' · '+g.st+'</span>')}
+    </dl>
+    <p class="blurb">The simulation held Sγ to the PDA anchor with a harmonic restraint at 3.00 Å rather than
+    forming a bond, so this view separates two things: the <b>thioether adduct the wet lab intends</b>, drawn here
+    at 1.82 Å, and the <b>tether the MD actually applied</b>. Retention counts how many of the ${c.nRef} starting
+    HER2 contacts survive — it is not an affinity.</p>
+    <button class="btn ghost" id="exitSite" type="button">Back to particle</button>`;
+}
+function renderInsp(){
+  if(S.sel.kind==='site') return renderSiteInsp();
+  const {kind,id}=S.sel, it=find(kind,id);
+  $('#insp-kind').textContent=CAT[kind].label;
+  const isP=kind==='peptide';
+  $('#insp-body').innerHTML=`
+    <div class="sel-head">
+      <span class="sw" style="background:var(${it.color})">${it.tag}</span>
+      <div><h3>${it.name}</h3><p>${isP?(it.control?'Control design':'Targeting design'):CAT[kind].label}</p></div>
+    </div>
+    ${isP?`<div class="seq mono">${seqHTML(it)}<br><span style="font-size:10px;color:var(--ink-3)">
+      ${it.n} residues · ${it.mw} Da · ${it.handle}</span></div>`:''}
+    <dl class="facts">${it.facts.concat(dynFacts(kind,it))
+      .map(([k,v])=>`<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+    <p class="blurb">${it.blurb}</p>`;
+}
+function renderGates(){
+  $('#gates').innerHTML=gates().map(g=>`
+    <div class="gate g-${g.st}">
+      <span class="ic">${g.st==='pass'?'✓':g.st==='warn'?'!':'×'}</span>
+      <span class="lb">${g.k}<em>${g.sub}</em></span>
+      <span class="vl mono">${g.v}</span>
+    </div>`).join('');
+}
+function renderHints(){
+  $('#v-dens').textContent=fmt(S.dens,1)+'%';
+  $('#v-link').textContent=fmt(S.link,1)+' nm';
+  $('#v-shell').textContent=S.shell+' nm';
+  $('#v-dia').textContent=fmtDia(S.dia);
+  $('#h-dia').innerHTML=S.dia<=200
+    ? 'Within the sub-200 nm window conventional for tumour uptake.'
+    : `<span style="color:var(--warn)">${fmtDia(S.dia)} is above the sub-200 nm target</span> — surface area per mg
+       falls, and loading falls with it.`+(S.dia===1310?'':
+       ` <button class="linkb" id="useS3">Use the measured S3 batch (1.31 µm)</button>`);
+  $('#h-dens').textContent=S.dens<0.8?'Sparse — loading limits the signal.'
+    :S.dens<=2.0?'Near the ~1% optimum reported for HER2 peptide carriers.'
+    :'Crowded — uptake plateaus and HER2-negative binding rises.';
+  $('#h-link').textContent=S.link<0.4?'Direct Cys–PDA bond; the recognition face sits close to the surface.'
+    :S.link<=2.0?'Enough reach to clear the shell without letting the peptide fold back.'
+    :'Long spacer; the chain folds back and buries its own contact residues.';
+}
+
+/* ================= results ================= */
+function verdict(r,ok){
+  if(r.p.control) return ['v-ctrl','Control'];
+  if(!ok) return ['v-drop','Blocked'];
+  if(r.score>=62) return ['v-adv','Advance'];
+  if(r.score>=45) return ['v-hold','Hold'];
+  return ['v-drop','Deprioritise'];
+}
+function renderRank(){
+  const gs=gates(), blocked=gs.some(g=>g.st==='fail');
+  const rows=PEPS.map(p=>evalDesign(p.id)).sort((a,b)=>b.score-a.score);
+  $('#rank').innerHTML=rows.map((r,i)=>{
+    const [vc,vt]=verdict(r,!blocked), on=r.p.id===S.peptide;
+    const w=clamp(r.Q,0,1)*100;
+    return `<div class="rk${on?' on':''}${i===0&&!r.p.control?' top':''}${r.p.control?' ctrl-row':''}"
+       data-pep="${r.p.id}" tabindex="0" role="button" aria-label="Select ${r.p.name}">
+      <div class="pos mono">${i+1}</div>
+      <div class="who"><i style="background:var(${r.p.color})"></i><div class="t">
+        <b>${r.p.name}${r.p.control?'<span class="tagc">control</span>':''}</b>
+        <em>${r.p.handle}</em></div></div>
+      <div class="meter-cell">
+        <div class="meter" data-tip="${r.p.name}|${fmt(r.Q,3)}|${r.p.iqr}">
+          <span class="fill" style="width:${w}%;background:var(${r.p.color})"></span>
+          <span class="tickmark" style="left:50%"></span></div>
+        <span class="mv mono">${fmt(r.Q,3)}</span></div>
+      <div class="n mono">${Math.round(r.A*100)}<small>%</small></div>
+      <div class="n mono">${fmt(r.load,2)}<small>nmol/mg</small></div>
+      <div class="n mono" style="font-weight:600">${Math.round(r.score)}<small>of 100</small></div>
+      <div class="n"><span class="verd ${vc}">${vt}</span></div></div>`;
+  }).join('');
+
+  const best=rows.find(r=>!r.p.control), cur=evalDesign(S.peptide);
+  const gfail=gs.filter(g=>g.st!=='pass');
+  $('#reco').innerHTML=blocked
+   ? `The current configuration fails <b>${gfail[0].k.toLowerCase()}</b> at ${gfail[0].v}. No design advances until the
+      geometry is fixed — increase the spacer or reduce density, then re-run.`
+   : `Advance <b>${best.p.name}</b> at <b>${fmt(S.dens,1)}% density</b> with a <b>${fmt(S.link,1)} nm spacer</b>
+      on ${find('carrier',S.carrier).name}/${find('coating',S.coating).name}.
+      Synthesise one parent batch, split into ${PEPS.length} matched portions plus a peptide-free portion, and read
+      HER2 recognition at equal carrier mass. Predicted loading ${fmt(best.load,2)} nmol/mg means the
+      ${best.p.name} and ${rows.filter(r=>!r.p.control)[1].p.name} arms need loading-adjusted comparison, not raw signal.
+      ${cur.sel<0.7?`<br>Selectivity margin is thin at this density — expect measurable HER2-negative binding.`:''}`;
+  $('#stamp').textContent='screened '+PEPS.length+' designs · '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+function renderStats(){
+  const {T,a,b}=releaseCurves(), r=evalDesign(S.peptide);
+  const i24=T.indexOf(24), i8=T.indexOf(8);
+  $('#s-sel').textContent=fmt(a[i24]/Math.max(b[i24],0.01),1)+'×';
+  $('#s-leak').textContent=Math.round(100-b[i8])+'%';
+  $('#s-load').innerHTML=fmt(r.load,2)+' <small>nmol/mg</small>';
+  $('#rel-sub').textContent=find('carrier',S.carrier).name+' · '+S.shell+' nm '+find('coating',S.coating).name
+    +' shell · sampling schedule 0.5–48 h';
+}
+
+/* ================= release chart ================= */
+function renderChart(){
+  const {T,a,b}=releaseCurves();
+  const W=620,H=300,ml=46,mr=58,mt=12,mb=36;
+  const pw=W-ml-mr, ph=H-mt-mb;
+  const X=i=>ml+i*(pw/(T.length-1)), Y=v=>mt+(1-v/100)*ph;
+  const path=arr=>arr.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+  const area=arr=>path(arr)+` L ${X(T.length-1).toFixed(1)} ${Y(0)} L ${X(0)} ${Y(0)} Z`;
+  const ink3=css('--ink-3'), line=css('--line'), c5=css('--r50'), c7=css('--r74');
+  const grid=[0,25,50,75,100].map(v=>`
+    <line x1="${ml}" y1="${Y(v)}" x2="${ml+pw}" y2="${Y(v)}" stroke="${line}" stroke-width="1"/>
+    <text x="${ml-9}" y="${Y(v)+3.5}" text-anchor="end" font-size="10" fill="${ink3}">${v}</text>`).join('');
+  const xlab=T.map((t,i)=>`<text x="${X(i)}" y="${H-mb+17}" text-anchor="middle" font-size="10" fill="${ink3}">${t}</text>`).join('');
+  const dots=arr=>arr.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===arr.length-1?4.5:3}"
+     fill="${arr===a?c5:c7}" stroke="${css('--panel')}" stroke-width="2"/>`).join('');
+  const hov=T.map((t,i)=>`<rect x="${X(i)-pw/(T.length-1)/2}" y="${mt}" width="${pw/(T.length-1)}" height="${ph}"
+     fill="transparent" pointer-events="all" data-i="${i}" class="hovz"/>`).join('');
+  $('#relsvg').innerHTML=`
+    ${grid}
+    <path d="${area(a)}" fill="${c5}" opacity=".10"/>
+    <path d="${path(b)}" fill="none" stroke="${c7}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${path(a)}" fill="none" stroke="${c5}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots(b)}${dots(a)}
+    <text x="${X(T.length-1)+9}" y="${Y(a[a.length-1])+4}" font-size="10.5" fill="${c5}" font-weight="600">pH 5.0</text>
+    <text x="${X(T.length-1)+9}" y="${Y(b[b.length-1])+4}" font-size="10.5" fill="${c7}" font-weight="600">pH 7.4</text>
+    <text x="${ml-9}" y="${mt-2}" text-anchor="end" font-size="9.5" fill="${ink3}">%</text>
+    <text x="${ml+pw/2}" y="${H-3}" text-anchor="middle" font-size="10" fill="${ink3}">Sampling time (h)</text>
+    <line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="${css('--line-2')}" stroke-width="1"/>
+    ${xlab}${hov}`;
+}
+
+/* ================= dossier ================= */
+function renderDoss(){
+  const r=evalDesign(S.peptide), {T,a,b}=releaseCurves(), i24=T.indexOf(24);
+  const car=find('carrier',S.carrier), coat=find('coating',S.coating), cg=find('cargo',S.cargo);
+  $('#doss').innerHTML=`
+  <div class="dcard"><h4>Build</h4><ul>
+    <li>Core — <b>${car.name}</b>, ${S.dia} nm</li>
+    <li>Layer — <b>${coat.name}</b>, ${S.shell} nm</li>
+    <li>Cargo — <b>${cg.name}</b></li>
+    <li>Peptide — <b>${r.p.name}</b> via ${r.p.handle.toLowerCase()}</li>
+    <li>Density — <b>${fmt(S.dens,1)}%</b> · spacer <b>${fmt(S.link,1)} nm</b></li></ul></div>
+
+  <div class="dcard"><h4>Predicted</h4>
+    <div class="big">${fmt(r.Q,3)} <small>Q<sub>HER2</sub></small></div>
+    <ul style="margin-top:7px">
+      <li>Recognition face exposed — ${Math.round(r.A*100)}%</li>
+      <li>Anchor feasibility — ${Math.round(r.F*100)}%</li>
+      <li>Loading — ${fmt(r.load,2)} nmol/mg</li>
+      <li>pH 5.0 release at 24 h — ${Math.round(a[i24])}%</li>
+      <li>Selectivity margin — ${Math.round(r.sel*100)}%</li></ul></div>
+
+  <div class="dcard"><h4>Prespecified experiment</h4><ol>
+    <li>Synthesise one ${cg.name}@${car.name} parent batch; deposit ${coat.name}.</li>
+    <li>Split into matched portions — ${PEPS.map(p=>p.name).join(', ')}, and peptide-free.</li>
+    <li>Functionalise 5 h, 10 mM HEPES pH 7.0, dark, 300 rpm; wash ×3.</li>
+    <li>Quantify loading by A<sub>280</sub> depletion and mass balance; record recovery.</li>
+    <li>HER2-coated plate, 2 µg/mL, BSA block, 2 h at 37 °C; read 490/514 nm.</li>
+    <li>Release at pH 7.4 and 5.0; adjust acidic aliquots to a common read pH.</li></ol></div>
+
+  <div class="dcard"><h4>Controls the run needs</h4><ul>
+    <li>Scrambled-peptide carrier — matched composition and chemistry</li>
+    <li>Peptide-free ${coat.name} carrier — adsorption floor</li>
+    <li>Non-HER2 protein well — protein specificity</li>
+    <li>No-coat well — plate adhesion</li>
+    <li>Free-peptide competition — sequence specificity</li>
+    <li>Known HER2 binder — assay positive control</li></ul></div>
+
+  <div class="dcard" style="grid-column:span 2"><h4>What this screen does not predict</h4>
+    <p class="blurb" style="margin:0">Q<sub>HER2</sub> measures how much of a modelled HER2–peptide contact pattern
+    survives near PDA. It is not a binding affinity, not a K<sub>d</sub>, and not a conjugation yield. Protein-corona
+    effects, media-dependent ${car.name} degradation, and batch variability are outside the model — which is why the
+    output is a ranked shortlist and a matched experiment, not a decision. The ranking is archived before the
+    recognition results are unblinded.</p></div>`;
+}
+function renderAll(){renderStack();renderInsp();renderGates();renderHints();renderRank();renderStats();renderChart();renderDoss();}
+</script>
+<script>
+/* ================= 3D stage ================= */
+const C3={zif:0xB8B0D8,edge:0xD6CFF0,bond:0x9A9470,pda:0x6E5949,pdaHull:0x4A3A30,flu:0xE9F556,
+  her2:0x7E9A86,cys:0xE8C35A,sel:0x3FA9B4,
+  pep:{cglt:0x2CA58D,ahnp:0xD17414,p51:0x9763CC,scr:0x8B9995}};
+const R=1.12;
+let scene,camera,renderer,root,raycaster,tris=[],G={},dragging=null,moved=0;
+let labelAtoms=[],siteMeas=[],labelPool=[];
+const sph={r:7.0,th:0.72,ph:1.18};
+const HOME=new THREE.Vector3(.62,0,0);
+let focus=new THREE.Vector3(.62,0,0), focusTarget=new THREE.Vector3(.62,0,0), rTarget=7.0, lblN=0, lblSel=[];
+const ELCOL={Zn:'#7FD08F',N:'#A8B8F5',C:'#CFC76A',O:'#F0776C',S:'#FFC24D',H:'#F2F2F8'};
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);
+  t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+function rhombicGeom(r,capture){
+  const D={x:0,y:1,z:2}, quads=[], pairs=[['x','y',2],['y','z',0],['x','z',1]];
+  for(const [a,b,k] of pairs) for(const sa of[1,-1]) for(const sb of[1,-1]){
+    const A=[0,0,0]; A[D[a]]=2*sa;
+    const B=[0,0,0]; B[D[b]]=2*sb;
+    const c1=[0,0,0]; c1[D[a]]=sa; c1[D[b]]=sb; c1[k]=1;
+    const c2=[0,0,0]; c2[D[a]]=sa; c2[D[b]]=sb; c2[k]=-1;
+    quads.push([A,c1,B,c2]);
+  }
+  const pos=[], tl=[];
+  const push=(p,q,s)=>{
+    const cx=(p[0]+q[0]+s[0])/3,cy=(p[1]+q[1]+s[1])/3,cz=(p[2]+q[2]+s[2])/3;
+    const ux=q[0]-p[0],uy=q[1]-p[1],uz=q[2]-p[2], vx=s[0]-p[0],vy=s[1]-p[1],vz=s[2]-p[2];
+    const nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx;
+    if(nx*cx+ny*cy+nz*cz<0){const t=q;q=s;s=t;}
+    const k=r/2;
+    pos.push(p[0]*k,p[1]*k,p[2]*k,q[0]*k,q[1]*k,q[2]*k,s[0]*k,s[1]*k,s[2]*k);
+    tl.push([[p[0]*k,p[1]*k,p[2]*k],[q[0]*k,q[1]*k,q[2]*k],[s[0]*k,s[1]*k,s[2]*k]]);
+  };
+  for(const [A,c1,B,c2] of quads){ push(A,c1,B); push(A,B,c2); }
+  if(capture) tris=tl;
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  g.computeVertexNormals();
+  return g;
+}
+function surfPt(rnd,edgeBias){
+  let t,u,v;
+  for(let k=0;k<(edgeBias?8:1);k++){
+    t=tris[Math.floor(rnd()*tris.length)];
+    u=rnd(); v=rnd(); if(u+v>1){u=1-u;v=1-v;}
+    if(!edgeBias) break;
+    if(rnd()>Math.min(u,v,1-u-v)*3*edgeBias) break;   // favour points near a facet edge
+  }
+  const [A,B,Cc]=t;
+  return new THREE.Vector3(
+    A[0]+u*(B[0]-A[0])+v*(Cc[0]-A[0]),
+    A[1]+u*(B[1]-A[1])+v*(Cc[1]-A[1]),
+    A[2]+u*(B[2]-A[2])+v*(Cc[2]-A[2]));
+}
+function disposeGroup(g){ if(!g)return; g.traverse(o=>{ if(o.geometry)o.geometry.dispose();
+  if(o.material) (Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose()); });
+  root.remove(g); }
+
+/* Atomistic ZIF-8. Zn sits on the sodalite (SOD) net — the 12d sites of Im-3m, i.e. every
+   permutation of (0, 1/4, 1/2) and (0, 3/4, 1/2) per cubic cell. Nearest Zn-Zn is a·√2/4,
+   and each of those contacts carries one 2-methylimidazolate bridge (Zn-N-C-N-Zn). The net is
+   generated over a block and cut to the rhombic dodecahedral habit the SEM shows. */
+const SOD=(()=>{const out=[],base=[0,.25,.5],alt=[0,.75,.5];
+  const perms=v=>[[v[0],v[1],v[2]],[v[0],v[2],v[1]],[v[1],v[0],v[2]],
+                  [v[1],v[2],v[0]],[v[2],v[0],v[1]],[v[2],v[1],v[0]]];
+  perms(base).forEach(p=>out.push(p)); perms(alt).forEach(p=>out.push(p));
+  return out.filter((p,i)=>out.findIndex(q=>q.every((c,j)=>Math.abs(c-p[j])<1e-9))===i);})();
+
+function buildFramework(Rc,cells){
+  const g=new THREE.Group(), a=2*Rc/cells, inRD=p=>{
+    const [x,y,z]=p; const t=Rc*1.001;
+    return Math.abs(x+y)<=t&&Math.abs(x-y)<=t&&Math.abs(y+z)<=t&&
+           Math.abs(y-z)<=t&&Math.abs(x+z)<=t&&Math.abs(x-z)<=t;};
+  const n=Math.ceil(cells/2)+1, zn=[];
+  for(let i=-n;i<=n;i++)for(let j=-n;j<=n;j++)for(let k=-n;k<=n;k++)
+    for(const b of SOD){
+      const p=[(i+b[0])*a,(j+b[1])*a,(k+b[2])*a];
+      if(inRD(p)) zn.push(new THREE.Vector3(p[0],p[1],p[2]));
+    }
+  const link=[], d0=a*Math.SQRT2/4, tol=d0*0.08;
+  for(let i=0;i<zn.length;i++)for(let j=i+1;j<zn.length;j++)
+    if(Math.abs(zn[i].distanceTo(zn[j])-d0)<tol) link.push([zn[i],zn[j]]);
+
+  const atoms=[], bonds=[];
+  const A_=(el,p)=>{const o={el,p};atoms.push(o);return o;};
+  const rr=d0*0.193, off=d0*0.092, me=d0*0.25, CH=1.08*AA, HM=1.09*AA;
+  zn.forEach(p=>A_('Zn',p));
+  const znAt=new Map(); atoms.forEach(o=>znAt.set(o.p,o));
+  for(const [A,B] of link){
+    const u=B.clone().sub(A).normalize();
+    let v=new THREE.Vector3(0.37,0.61,0.71); v.sub(u.clone().multiplyScalar(v.dot(u))).normalize();
+    const c=A.clone().add(B).multiplyScalar(.5).addScaledVector(v,off);
+    const rp=k=>{const t=k*2*Math.PI/5;
+      return c.clone().addScaledVector(v,Math.cos(t)*rr).addScaledVector(u,Math.sin(t)*rr);};
+    // pentagon order C2, N1, C5, C4, N3 gives imidazolate connectivity N1-C2-N3-C4-C5-N1
+    const C2=A_('C',rp(0)), N1=A_('N',rp(1)), C5=A_('C',rp(2)), C4=A_('C',rp(3)), N3=A_('N',rp(4));
+    const CM=A_('C',c.clone().addScaledVector(v,rr+me));
+    const rad=p=>p.clone().sub(c).normalize();
+    const H4=A_('H',C4.p.clone().addScaledVector(rad(C4.p),CH));
+    const H5=A_('H',C5.p.clone().addScaledVector(rad(C5.p),CH));
+    const ax=CM.p.clone().sub(C2.p).normalize();
+    let pA=u.clone(); pA.sub(ax.clone().multiplyScalar(pA.dot(ax))).normalize();
+    const pB=new THREE.Vector3().crossVectors(ax,pA);
+    const hm=[0,1,2].map(k=>{const t=k*2*Math.PI/3;
+      const d=ax.clone().multiplyScalar(Math.cos(1.23))
+        .addScaledVector(pA,Math.sin(1.23)*Math.cos(t))
+        .addScaledVector(pB,Math.sin(1.23)*Math.sin(t));
+      return A_('H',CM.p.clone().addScaledVector(d,HM));});
+    bonds.push([znAt.get(A),N3],[znAt.get(B),N1],[N1,C2],[C2,N3],[N3,C4],[C4,C5],[C5,N1],
+               [C2,CM],[C4,H4],[C5,H5],[CM,hm[0]],[CM,hm[1]],[CM,hm[2]]);
+  }
+  g.add(molGroup(atoms,bonds,S.rep,'carrier'));
+  const lab=atoms.filter(o=>o.el!=='H');
+  g.userData={zn:zn.length,link:link.length,atoms:atoms.length,lab};
+  return g;
+}
+
+/* The attachment site at true local scale: AA world units per Angstrom. A DHI-derived
+   indole-5,6-quinone (the reactive unit of PDA) carrying a cysteine thioether adduct at C4 —
+   the Michael addition the wet-lab protocol relies on. Bond lengths are literature values. */
+/* Element palette and radii follow the conventions in the reference renders:
+   yellow carbon, periwinkle nitrogen, white hydrogen, green zinc, red oxygen. */
+const VDW={H:1.20,C:1.70,N:1.55,O:1.52,S:1.80,Zn:1.39};      // van der Waals, Angstrom
+const BSR={H:0.40,C:0.60,N:0.58,O:0.56,S:0.70,Zn:0.80};      // ball-and-stick display radii
+const ELC={H:0xEFEFF6,C:0xB8B054,N:0x8FA6F0,O:0xE0574C,S:0xFFB627,Zn:0x5FC078};
+function molGroup(atoms,bonds,rep,kind){
+  const g=new THREE.Group(), fill=rep==='fill', stick=rep==='stick';
+  const sr=(stick?0.30:0.20)*AA;
+  const rad=el=>fill?VDW[el]*AA:(stick?sr:BSR[el]*AA);
+  const M=new THREE.Matrix4(), q=new THREE.Quaternion(), one=new THREE.Vector3(1,1,1);
+  const byEl={}; atoms.forEach(a=>{(byEl[a.el]=byEl[a.el]||[]).push(a);});
+  Object.keys(byEl).forEach(el=>{
+    const list=byEl[el];
+    const m=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(rad(el),fill?2:1),
+      new THREE.MeshStandardMaterial({color:ELC[el],roughness:.44,metalness:.02}),list.length);
+    list.forEach((a,i)=>{M.compose(a.p,q,one);m.setMatrixAt(i,M);});
+    m.instanceMatrix.needsUpdate=true; m.userData={kind}; g.add(m);
+  });
+  if(!fill&&bonds.length){
+    const UP=new THREE.Vector3(0,1,0), half={};
+    bonds.forEach(([a,b])=>{
+      const mid=a.p.clone().add(b.p).multiplyScalar(.5);
+      (half[a.el]=half[a.el]||[]).push([a.p,mid]);
+      (half[b.el]=half[b.el]||[]).push([b.p,mid]);
+    });
+    Object.keys(half).forEach(el=>{
+      const list=half[el];
+      const m=new THREE.InstancedMesh(new THREE.CylinderGeometry(sr,sr,1,6),
+        new THREE.MeshStandardMaterial({color:ELC[el],roughness:.5,metalness:.02}),list.length);
+      list.forEach(([A,B],i)=>{
+        const d=B.clone().sub(A), L=d.length();
+        q.setFromUnitVectors(UP,d.clone().normalize());
+        M.compose(A.clone().add(B).multiplyScalar(.5),q,new THREE.Vector3(1,L,1));
+        m.setMatrixAt(i,M);});
+      m.instanceMatrix.needsUpdate=true; m.userData={kind}; g.add(m);
+    });
+  }
+  return g;
+}
+let AA=0.0365;                       // world units per Angstrom, set from the lattice in build3D
+const RAD_A={Zn:1.10,S:0.95,O:0.72,N:0.70,C:0.66};   // ball-and-stick display radii, Angstrom
+function buildSite(P,N){
+  const g=new THREE.Group(), atoms=[], bonds=[], meas=[];
+  let e1=new THREE.Vector3(0.31,0.77,0.56);
+  e1.sub(N.clone().multiplyScalar(e1.dot(N))).normalize();
+  const e2=new THREE.Vector3().crossVectors(N,e1).normalize();
+  const at=(r,deg,z)=>P.clone()
+    .addScaledVector(e1,r*Math.cos(deg*Math.PI/180)*AA)
+    .addScaledVector(e2,r*Math.sin(deg*Math.PI/180)*AA)
+    .addScaledVector(N,z*AA);
+  const A=(name,el,p)=>{const o={name,el,p};atoms.push(o);return o;};
+  const Z=1.25;
+  const ring=[['C3a',0],['C4',60],['C5',120],['C6',180],['C7',240],['C7a',300]]
+    .map(([n,d])=>A(n,'C',at(1.39,d,Z)));
+  const O5=A('O','O',at(2.61,120,Z)), O6=A('O','O',at(2.61,180,Z));
+  const C3=A('C3','C',at(2.50,350,Z)), N1=A('N1','N',at(2.50,310,Z)), C2=A('C2','C',at(3.30,330,Z));
+  const Sg=A('Sγ','S',at(3.17,60,Z));
+  const Cb=A('Cβ','C',at(3.55,64,Z+1.65)), Ca=A('Cα','C',at(3.80,68,Z+3.15));
+  const H7=A('H','H',at(2.47,240,Z)), H3=A('H','H',at(3.55,356,Z));
+  const H2=A('H','H',at(4.38,330,Z)), HN=A('H','H',at(3.56,303,Z));
+  const HB1=A('H','H',at(4.55,60,Z+1.5)), HB2=A('H','H',at(3.15,74,Z+2.10));
+  for(let i=0;i<6;i++) bonds.push([ring[i],ring[(i+1)%6]]);
+  bonds.push([ring[2],O5],[ring[3],O6],[ring[0],C3],[C3,C2],[C2,N1],[N1,ring[5]],
+             [ring[1],Sg],[Sg,Cb],[Cb,Ca],
+             [ring[4],H7],[C3,H3],[C2,H2],[N1,HN],[Cb,HB1],[Cb,HB2]);
+  meas.push({a:ring[1].p,b:Sg.p,t:'1.82 Å'},{a:ring[2].p,b:O5.p,t:'1.22 Å'});
+
+  g.add(molGroup(atoms,bonds,S.rep==='fill'?'fill':'bs','site'));
+  meas.forEach(m=>{
+    const dl=new THREE.Line(new THREE.BufferGeometry().setFromPoints([m.a,m.b]),
+      new THREE.LineDashedMaterial({color:0xF0ECFF,dashSize:0.010,gapSize:0.007,
+        transparent:true,opacity:.9}));
+    dl.computeLineDistances(); g.add(dl);
+  });
+  const ctr=new THREE.Vector3();
+  atoms.forEach(a=>ctr.add(a.p)); ctr.multiplyScalar(1/atoms.length);
+  g.userData={atoms,meas,center:ctr};
+  return g;
+}
+
+/* Cartoon representation: beta strands swept as flat arrows, helices as coiled ribbons,
+   loops as thin tubes — the convention the reference structure image uses. */
+function ribbonGeom(curve,segs,wFn,th){
+  const fr=curve.computeFrenetFrames(segs,false), pos=[], idx=[];
+  for(let i=0;i<=segs;i++){
+    const t=i/segs, p=curve.getPoint(t), Nv=fr.normals[i], Bv=fr.binormals[i];
+    const w=wFn(t)/2, h=th/2;
+    [[w,h],[-w,h],[-w,-h],[w,-h]].forEach(([x,y])=>{
+      const v=p.clone().addScaledVector(Nv,x).addScaledVector(Bv,y);
+      pos.push(v.x,v.y,v.z);});
+  }
+  for(let i=0;i<segs;i++){
+    const a=i*4, b=(i+1)*4;
+    for(let k=0;k<4;k++){const k2=(k+1)%4; idx.push(a+k,b+k,b+k2,a+k,b+k2,a+k2);}
+  }
+  const gm=new THREE.BufferGeometry();
+  gm.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  gm.setIndex(idx); gm.computeVertexNormals(); return gm;
+}
+function her2Ribbon(){
+  const g=new THREE.Group(), rnd=mulberry(11);
+  const mat=op=>new THREE.MeshStandardMaterial({color:0x74B389,roughness:.55,metalness:0,
+    side:THREE.DoubleSide,transparent:op<1,opacity:op});
+  const arrowW=W=>t=>t<0.70?W:(t<0.74?W*1.8:W*1.8*Math.max(0,1-(t-0.74)/0.26));
+  const doms=[{y:1.02,n:4,o:0.80},{y:0.35,n:4,o:0.92},{y:-0.34,n:5,o:1},{y:-1.00,n:4,o:0.88}];
+  doms.forEach((d,di)=>{
+    const m=mat(d.o), C=new THREE.Vector3(0,d.y,0);
+    const ax=new THREE.Vector3(0,1,0).applyAxisAngle(new THREE.Vector3(0,0,1),(rnd()-.5)*1.1)
+      .applyAxisAngle(new THREE.Vector3(1,0,0),(rnd()-.5)*0.8).normalize();
+    let sp=new THREE.Vector3(1,0,0); sp.sub(ax.clone().multiplyScalar(sp.dot(ax))).normalize();
+    const nr=new THREE.Vector3().crossVectors(ax,sp).normalize();
+    const L=0.44, gap=0.118, ends=[];
+    for(let k=0;k<d.n;k++){
+      const o=(k-(d.n-1)/2)*gap, bend=Math.sin(k/Math.max(1,d.n-1)*Math.PI)*0.075, dir=(k%2?-1:1);
+      const base=C.clone().addScaledVector(sp,o).addScaledVector(nr,bend);
+      const p0=base.clone().addScaledVector(ax,-L/2*dir);
+      const p1=base.clone().addScaledVector(ax, L/2*dir);
+      const mid=base.clone().addScaledVector(nr,0.032);
+      g.add(new THREE.Mesh(ribbonGeom(new THREE.CatmullRomCurve3([p0,mid,p1]),24,arrowW(0.088),0.026),m));
+      ends.push([p0,p1]);
+    }
+    for(let k=0;k<d.n-1;k++){
+      const a=ends[k][1], b=ends[k+1][0], out=a.clone().sub(C).normalize();
+      const c1=a.clone().addScaledVector(out,0.085).addScaledVector(sp,0.02);
+      const c2=b.clone().addScaledVector(out,0.085).addScaledVector(sp,-0.02);
+      g.add(new THREE.Mesh(new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3([a,c1,c2,b]),16,0.016,6,false),m));
+    }
+    if(di%2===1){
+      const hc=C.clone().addScaledVector(sp,(d.n/2+0.9)*gap).addScaledVector(nr,0.04), pts=[];
+      for(let i=0;i<=44;i++){const t=i/44, an=t*Math.PI*2*2.6;
+        pts.push(hc.clone().addScaledVector(sp,Math.cos(an)*0.056)
+          .addScaledVector(nr,Math.sin(an)*0.056).addScaledVector(ax,(t-0.5)*0.30));}
+      g.add(new THREE.Mesh(ribbonGeom(new THREE.CatmullRomCurve3(pts),64,()=>0.072,0.022),m));
+    }
+  });
+  for(let i=0;i<doms.length-1;i++){
+    const a=new THREE.Vector3(0.04,doms[i].y-0.23,0.02), b=new THREE.Vector3(-0.03,doms[i+1].y+0.23,-0.02);
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(
+      [a,a.clone().add(new THREE.Vector3(0.11,-0.07,0.06)),
+       b.clone().add(new THREE.Vector3(-0.09,0.07,-0.05)),b]),18,0.016,6,false),mat(0.85)));
+  }
+  return g;
+}
+
+function build3D(){
+  Object.values(G).forEach(disposeGroup); G={};
+  const car=find('carrier',S.carrier), coat=find('coating',S.coating), p=find('peptide',S.peptide);
+  const r=evalDesign(S.peptide);
+  const dia=0.62+0.50*Math.log10(S.dia/60)/Math.log10(2000/60);   // visual size cue, log scale
+  const geo=rhombicGeom(R*dia,true);   // captures the core surface for deposits
+  AA=(2*R*dia/2.8)/16.99;              // ZIF-8 a = 16.99 Å fixes the atomic scale
+  const nCh=p?Math.round(clamp(6+S.dens*4.6,5,32)):0, anchors=[];
+  if(p){
+    const ra=mulberry(p.id.length*97+31);
+    for(let c=0;c<nCh;c++){
+      const Pa=surfPt(ra,0.35), Na=Pa.clone().normalize();
+      Pa.addScaledVector(Na,0.022+S.shell*0.0022);
+      anchors.push({P:Pa,N:Na,T:new THREE.Vector3(ra()-.5,ra()-.5,ra()-.5)});
+    }
+  }
+  S.siteIdx=clamp(S.siteIdx|0,0,Math.max(0,nCh-1));
+  S.siteP=anchors.length?anchors[S.siteIdx].P:null;
+  S.siteN=anchors.length?anchors[S.siteIdx].N:null;
+
+  /* --- crystal --- */
+  G.carrier=new THREE.Group();
+  const atomic=S.rep!=='solid';
+  const cm=new THREE.MeshStandardMaterial({color:C3.zif,flatShading:true,roughness:.42,metalness:.14,
+    transparent:true,opacity:atomic?0.05:(S.show.cut?0.24:0.55),
+    depthWrite:atomic?false:!S.show.cut});
+  const mesh=new THREE.Mesh(geo,cm); mesh.userData={kind:'carrier'};
+  const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+    new THREE.LineBasicMaterial({color:C3.edge,transparent:true,opacity:atomic?.26:.5}));
+  G.carrier.add(mesh,edges);
+  if(atomic){
+    const fw=buildFramework(R*dia,2.8);
+    S.fwStats=fw.userData; G.carrier.add(fw);
+  } else S.fwStats=null;
+  root.add(G.carrier);
+
+  /* --- cargo --- */
+  if(S.show.cargo){
+    G.cargo=new THREE.Group();
+    const rnd=mulberry(7), n=85, cr=R*dia;
+    const cg=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(cr*0.030,1),
+      new THREE.MeshStandardMaterial({color:C3.flu,roughness:.35,
+        emissive:C3.flu,emissiveIntensity:.75}),n);
+    const Mc=new THREE.Matrix4(), qc=new THREE.Quaternion(), oc=new THREE.Vector3(1,1,1);
+    for(let i=0;i<n;i++){
+      let v; do{ v=new THREE.Vector3(rnd()*2-1,rnd()*2-1,rnd()*2-1); }while(v.length()>1);
+      v.multiplyScalar(cr*0.70); Mc.compose(v,qc,oc); cg.setMatrixAt(i,Mc);
+    }
+    cg.instanceMatrix.needsUpdate=true; cg.userData={kind:'cargo'};
+    G.cargo.add(cg); root.add(G.cargo);
+  }
+
+  /* --- coating --- */
+  G.coating=new THREE.Group();
+  const hull=new THREE.Mesh(rhombicGeom(R*dia*(1.02+S.shell*0.0035),false),
+    new THREE.MeshStandardMaterial({color:C3.pdaHull,flatShading:true,roughness:.95,
+      transparent:true,opacity:S.rep!=='solid'?.10:.30,depthWrite:false}));
+  hull.userData={kind:'coating'};
+  const cnt=Math.round(85+S.shell*15), ig=new THREE.IcosahedronGeometry(.028,0);
+  const im=new THREE.InstancedMesh(ig,new THREE.MeshStandardMaterial({color:C3.pda,roughness:.85,flatShading:true}),cnt);
+  const rnd2=mulberry(21), M=new THREE.Matrix4(), q=new THREE.Quaternion(), sc=new THREE.Vector3();
+  for(let i=0;i<cnt;i++){
+    const P=surfPt(rnd2,0.8), N=P.clone().normalize();
+    P.addScaledVector(N,0.006+S.shell*0.0016);
+    if(S.mode==='site'&&S.siteP&&P.distanceTo(S.siteP)<0.34){
+      sc.set(0,0,0); M.compose(P,q,sc); im.setMatrixAt(i,M); continue;   // keep the site readable
+    }
+    const s=0.42+rnd2()*0.70+S.shell*0.016; sc.set(s,s*0.82,s);
+    q.setFromEuler(new THREE.Euler(rnd2()*3,rnd2()*3,rnd2()*3));
+    M.compose(P,q,sc); im.setMatrixAt(i,M);
+  }
+  im.instanceMatrix.needsUpdate=true; im.userData={kind:'coating'};
+  if(!S.show.cut) G.coating.add(hull,im);
+  // free PDA formed away from the cores — S3 fields show this, and it scales with dopamine load
+  const freeN=S.mode==='site'?0:Math.round(clamp((S.shell-5)*13,0,150));
+  S.freePDA=freeN>0;
+  if(freeN>0){
+    const fm=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.034,0),
+      new THREE.MeshStandardMaterial({color:C3.pda,roughness:.92,flatShading:true}),freeN);
+    const rf=mulberry(53), ctr=[];
+    for(let c=0;c<2;c++){
+      const d=new THREE.Vector3(rf()*2-1,rf()*2-1,rf()*2-1).normalize();
+      if(d.x>0.15) d.x=-d.x;
+      ctr.push(d.multiplyScalar(R*dia*1.62+rf()*0.30));
+    }
+    for(let i=0;i<freeN;i++){
+      const p=ctr[i%2].clone().add(new THREE.Vector3(rf()-.5,rf()-.5,rf()-.5).multiplyScalar(0.26));
+      const z=0.6+rf()*0.85; sc.set(z,z*0.85,z);
+      q.setFromEuler(new THREE.Euler(rf()*3,rf()*3,rf()*3));
+      M.compose(p,q,sc); fm.setMatrixAt(i,M);
+    }
+    fm.instanceMatrix.needsUpdate=true; fm.userData={kind:'coating'};
+    G.coating.add(fm);
+  }
+  root.add(G.coating);
+
+  /* --- peptides --- */
+  if(p){
+    G.peptide=new THREE.Group();
+    const col=C3.pep[p.id]||0x8B9995;
+    const Lt=0.19+p.n*0.0145+S.link*0.052;
+    const fold=clamp(1-r.A,0,.9);
+    const tubeMat=new THREE.MeshStandardMaterial({color:col,roughness:.5,metalness:.05});
+    const beadG=new THREE.SphereGeometry(.042,7,5);
+    const beads=new THREE.InstancedMesh(beadG,new THREE.MeshStandardMaterial({color:col,roughness:.55}),nCh*p.n);
+    let bi=0;
+    for(let c=0;c<nCh;c++){
+      if(S.mode==='site'&&c!==S.siteIdx) continue;   // isolate the inspected chain
+      const {P,N}=anchors[c];
+      let T=anchors[c].T.clone();
+      T.sub(N.clone().multiplyScalar(T.dot(N))).normalize();
+      const pts=[P.clone(),
+        P.clone().addScaledVector(N,Lt*0.30),
+        P.clone().addScaledVector(N,Lt*0.66).addScaledVector(T,Lt*0.22*fold),
+        P.clone().addScaledVector(N,Lt*(0.98-0.60*fold)).addScaledVector(T,Lt*(0.60*fold+0.10))];
+      const curve=new THREE.CatmullRomCurve3(pts);
+      const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,16,.026,6,false),tubeMat);
+      tube.userData={kind:'peptide'}; G.peptide.add(tube);
+      for(let k=0;k<p.n;k++){
+        const v=curve.getPoint(k/(p.n-1||1));
+        M.compose(v,new THREE.Quaternion(),new THREE.Vector3(1,1,1)); beads.setMatrixAt(bi++,M);
+      }
+      const cys=new THREE.Mesh(new THREE.SphereGeometry(.055,9,7),
+        new THREE.MeshStandardMaterial({color:C3.cys,roughness:.4,emissive:C3.cys,emissiveIntensity:.18}));
+      cys.position.copy(P); cys.userData={kind:'peptide',ci:c}; G.peptide.add(cys);
+      if(S.mode==='site'&&c===S.siteIdx) cys.visible=false;   // replaced by the atomistic Sγ
+      const tip=new THREE.Mesh(new THREE.SphereGeometry(.062,10,8),
+        new THREE.MeshStandardMaterial({color:col,roughness:.35,emissive:col,emissiveIntensity:.3}));
+      tip.position.copy(curve.getPoint(1)); tip.userData={kind:'peptide'}; G.peptide.add(tip);
+    }
+    const zero=new THREE.Vector3(0,0,0), qz=new THREE.Quaternion(), org=new THREE.Vector3();
+    for(;bi<nCh*p.n;bi++){ M.compose(org,qz,zero); beads.setMatrixAt(bi,M); }
+    beads.instanceMatrix.needsUpdate=true; beads.userData={kind:'peptide'};
+    G.peptide.add(beads); root.add(G.peptide);
+  }
+
+  /* --- attachment site, at true local scale --- */
+  labelAtoms=[];
+  if(S.rep!=='solid'&&S.fwStats&&S.fwStats.lab) labelAtoms=S.fwStats.lab.slice();
+  if(S.mode==='site'&&S.siteP){
+    G.site=buildSite(S.siteP,S.siteN);
+    labelAtoms=labelAtoms.concat(G.site.userData.atoms);
+    siteMeas=G.site.userData.meas;
+    root.add(G.site);
+  } else siteMeas=[];
+
+  /* --- HER2 ectodomain --- */
+  if(S.show.her2){
+    G.her2=her2Ribbon();
+    G.her2.position.set(1.78,.12,-.12); G.her2.rotation.z=-.20;
+    G.her2.scale.setScalar(.64); root.add(G.her2);
+  }
+
+  applySel();
+}
+function applySel(){
+  const k=S.sel.kind, g=G[k];
+  Object.entries(G).forEach(([key,grp])=>grp.traverse(o=>{
+    if(o.material&&o.material.emissive&&!o.userData.keepEm){
+      if(key===k){ o.material.emissive.setHex(C3.sel); o.material.emissiveIntensity=.34; }
+      else if(o.material.emissiveIntensity===.34){ o.material.emissive.setHex(0x000000); o.material.emissiveIntensity=0; }
+    }}));
+}
+function init3D(){
+  const vp=$('#vp');
+  scene=new THREE.Scene(); root=new THREE.Group(); scene.add(root);
+  camera=new THREE.PerspectiveCamera(38,vp.clientWidth/vp.clientHeight,.1,100);
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(vp.clientWidth,vp.clientHeight);
+  vp.appendChild(renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xA6CBD3,0x101A1C,.95));
+  const gc=document.createElement('canvas'); gc.width=gc.height=512;
+  const gx=gc.getContext('2d');
+  gx.fillStyle='rgba(96,140,148,0.30)'; gx.fillRect(0,0,512,512);
+  gx.fillStyle='rgba(190,220,224,0.24)';
+  for(let i=16;i<512;i+=22) for(let j=16;j<512;j+=22){gx.beginPath();gx.arc(i,j,1,0,7);gx.fill();}
+  gx.globalCompositeOperation='destination-in';
+  const gg=gx.createRadialGradient(256,256,0,256,256,250);
+  gg.addColorStop(0,'rgba(0,0,0,1)'); gg.addColorStop(.55,'rgba(0,0,0,.55)'); gg.addColorStop(1,'rgba(0,0,0,0)');
+  gx.fillStyle=gg; gx.fillRect(0,0,512,512);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(18,18),
+    new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(gc),transparent:true,depthWrite:false}));
+  ground.rotation.x=-Math.PI/2; ground.position.y=-1.75; scene.add(ground);
+  const d1=new THREE.DirectionalLight(0xffffff,.8); d1.position.set(4,6,6); scene.add(d1);
+  const d2=new THREE.DirectionalLight(0x8FC4D6,.35); d2.position.set(-5,-3,-4); scene.add(d2);
+  raycaster=new THREE.Raycaster(); raycaster.params.Points.threshold=.09;
+
+  const cv=renderer.domElement;
+  cv.addEventListener('pointerdown',e=>{dragging={x:e.clientX,y:e.clientY};moved=0;cv.setPointerCapture(e.pointerId)});
+  cv.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    const dx=e.clientX-dragging.x, dy=e.clientY-dragging.y;
+    moved+=Math.abs(dx)+Math.abs(dy);
+    sph.th-=dx*.0075; sph.ph=clamp(sph.ph-dy*.0065,.28,2.86);
+    dragging={x:e.clientX,y:e.clientY};
+  });
+  cv.addEventListener('pointerup',e=>{ if(dragging&&moved<5) pick(e); dragging=null; });
+  cv.addEventListener('pointercancel',()=>dragging=null);
+  cv.addEventListener('wheel',e=>{e.preventDefault();
+    rTarget=clamp(rTarget*(1+e.deltaY*.0011),S.mode==='site'?0.30:1.45,13);},{passive:false});
+  new ResizeObserver(()=>{
+    if(!vp.clientWidth)return;
+    camera.aspect=vp.clientWidth/vp.clientHeight; camera.updateProjectionMatrix();
+    renderer.setSize(vp.clientWidth,vp.clientHeight);
+  }).observe(vp);
+  (function loop(){
+    requestAnimationFrame(loop);
+    if(S.show.spin&&!dragging&&S.mode!=='site')sph.th+=.0022;
+    sph.r+=(rTarget-sph.r)*0.13;
+    focus.lerp(focusTarget,0.13);
+    camera.position.set(focus.x+sph.r*Math.sin(sph.ph)*Math.sin(sph.th),
+      focus.y+sph.r*Math.cos(sph.ph), focus.z+sph.r*Math.sin(sph.ph)*Math.cos(sph.th));
+    camera.lookAt(focus);
+    renderer.render(scene,camera);
+    updateLabels();
+  })();
+}
+const LBOX=()=>document.getElementById('labels');
+function lblEl(i){
+  const box=LBOX();
+  while(labelPool.length<=i){
+    const sp=document.createElement('span'); sp.className='alab'; box.appendChild(sp); labelPool.push(sp);
+  }
+  return labelPool[i];
+}
+function updateLabels(){
+  const site=S.mode==='site', on=site||sph.r<2.6;
+  const bar=document.getElementById('scalebar');
+  if(bar) bar.hidden=!site;
+  if(!on){ labelPool.forEach(el=>el.style.display='none'); return; }
+  if(lblN++%18===0){
+    lblSel=labelAtoms.map(a=>({a,d:a.p.distanceToSquared(focus)}))
+      .sort((x,y)=>x.d-y.d).slice(0,site?24:18).map(x=>x.a);
+  }
+  const w=renderer.domElement.clientWidth, h=renderer.domElement.clientHeight;
+  const v=new THREE.Vector3(); let i=0;
+  const put=(pos,text,col,cls)=>{
+    v.copy(pos).project(camera);
+    const el=lblEl(i++);
+    if(v.z>1||v.z<-1){ el.style.display='none'; return; }
+    el.style.display=''; el.className='alab'+(cls||''); el.textContent=text;
+    el.style.color=col; el.style.left=((v.x*.5+.5)*w).toFixed(1)+'px';
+    el.style.top=((-v.y*.5+.5)*h).toFixed(1)+'px';
+  };
+  lblSel.forEach(a=>put(a.p,site&&a.name?a.name:a.el,ELCOL[a.el]||'#B4C0C7'));
+  if(site) siteMeas.forEach(m=>put(m.a.clone().add(m.b).multiplyScalar(.5),m.t,'#8FE3EA',' m'));
+  for(;i<labelPool.length;i++) labelPool[i].style.display='none';
+  if(site&&bar){
+    const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0);
+    const a=focus.clone().project(camera), b=focus.clone().addScaledVector(right,5*AA).project(camera);
+    bar.querySelector('.bar').style.width=Math.max(8,Math.abs(b.x-a.x)*.5*w).toFixed(0)+'px';
+  }
+}
+function enterSite(idx){
+  S.mode='site'; S.siteIdx=idx|0; S.sel={kind:'site',id:'site'};
+  build3D();
+  if(G.site&&G.site.userData.center) focusTarget.copy(G.site.userData.center);
+  else if(S.siteP) focusTarget.copy(S.siteP);
+  rTarget=1.25; syncTools(); renderAll();
+  $('#vp-note').style.display='none';
+}
+function exitSite(){
+  S.mode='particle'; S.sel={kind:'peptide',id:S.peptide||S.carrier};
+  if(!S.peptide) S.sel={kind:'carrier',id:S.carrier};
+  build3D(); focusTarget.copy(HOME); rTarget=7.0; syncTools(); renderAll();
+  $('#vp-note').style.display='';
+}
+function syncTools(){
+  $$('.tool').forEach(t=>t.classList.toggle('on',
+    t.dataset.t==='site'?S.mode==='site':!!S.show[t.dataset.t]));
+}
+function pick(e){
+  const rect=renderer.domElement.getBoundingClientRect();
+  const m=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);
+  raycaster.setFromCamera(m,camera);
+  const hit=raycaster.intersectObjects(root.children,true).find(h=>h.object.userData&&h.object.userData.kind);
+  if(!hit) return;
+  const ud=hit.object.userData;
+  if(ud.ci!==undefined){ enterSite(ud.ci); return; }
+  if(ud.kind==='site'){ S.sel={kind:'site',id:'site'}; renderInsp(); return; }
+  select(ud.kind,S[ud.kind]);
+}
+</script>
+<script>
+/* ================= interaction ================= */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+function install(kind,id){
+  const changed=S[kind]!==id;
+  S[kind]=id; S.sel={kind,id};
+  renderLib();
+  if(changed||kind==='peptide') build3D(); else applySel();
+  renderAll();
+}
+function select(kind,id){
+  if(!id){ S.sel={kind:'carrier',id:S.carrier}; } else { S.sel={kind,id}; }
+  renderLib(); applySel(); renderStack(); renderInsp(); renderRank();
+}
+function clearPeptide(){
+  S.peptide=null; S.sel={kind:'carrier',id:S.carrier};
+  renderLib(); build3D(); renderAll();
+}
+
+document.addEventListener('click',e=>{
+  const x=e.target.closest('[data-clear]');
+  if(x){ e.stopPropagation(); clearPeptide(); return; }
+  if(e.target.id==='useS3'){ S.dia=1310; $('#p-dia').value=1310;
+    renderHints(); build3D(); renderAll(); return; }
+  const lib=e.target.closest('.lib');
+  if(lib){ install(lib.dataset.kind,lib.dataset.id); return; }
+  const chip=e.target.closest('.chip[data-kind]');
+  if(chip){ select(chip.dataset.kind,chip.dataset.id); return; }
+  const rk=e.target.closest('.rk[data-pep]');
+  if(rk){ install('peptide',rk.dataset.pep); return; }
+  const tab=e.target.closest('.tab');
+  if(tab){ $$('.tab').forEach(t=>t.classList.toggle('on',t===tab));
+    $$('.pane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+tab.dataset.p));
+    S.tab=tab.dataset.p; if(S.tab==='rel') renderChart(); return; }
+  const rep=e.target.closest('.repbar button');
+  if(rep){ S.rep=rep.dataset.r;
+    $$('.repbar button').forEach(b=>b.classList.toggle('on',b===rep));
+    build3D(); renderAll(); return; }
+  if(e.target.id==='exitSite'){ exitSite(); return; }
+  const tool=e.target.closest('.tool');
+  if(tool){ const t=tool.dataset.t;
+    if(t==='site'){ S.mode==='site'?exitSite():enterSite(S.siteIdx); return; }
+    S.show[t]=!S.show[t]; tool.classList.toggle('on',S.show[t]);
+    if(t!=='spin') build3D(); return; }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&S.mode==='site'){ exitSite(); return; }
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const el=e.target.closest('.chip[data-kind],.rk[data-pep],.lib');
+  if(el){ e.preventDefault(); el.click(); }
+});
+
+/* drag and drop */
+document.addEventListener('dragstart',e=>{
+  if(e.target.id==='useS3'){ S.dia=1310; $('#p-dia').value=1310;
+    renderHints(); build3D(); renderAll(); return; }
+  const lib=e.target.closest('.lib'); if(!lib)return;
+  e.dataTransfer.setData('text/plain',lib.dataset.kind+':'+lib.dataset.id);
+  e.dataTransfer.effectAllowed='copy';
+});
+['#vp','#stack'].forEach(sel=>{
+  const el=$(sel);
+  el.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy';$('#vp').classList.add('drop')});
+  el.addEventListener('dragleave',()=>$('#vp').classList.remove('drop'));
+  el.addEventListener('drop',e=>{
+    e.preventDefault(); $('#vp').classList.remove('drop');
+    const [kind,id]=(e.dataTransfer.getData('text/plain')||'').split(':');
+    if(kind&&id&&CAT[kind]) install(kind,id);
+  });
+});
+
+/* sliders */
+[['#p-dens','dens',1],['#p-link','link',1],['#p-shell','shell',0],['#p-dia','dia',0]].forEach(([sel,key])=>{
+  const el=$(sel);
+  el.addEventListener('input',()=>{ S[key]=parseFloat(el.value); renderHints();
+    renderGates(); renderRank(); renderStats(); renderChart(); renderDoss(); });
+  el.addEventListener('change',()=>build3D());
+});
+
+/* run screen */
+$('#run').addEventListener('click',async()=>{
+  const btn=$('#run'), note=$('#vp-note');
+  btn.disabled=true;
+  const steps=['Packing 3 PDA surfaces','Screening placements','Explicit-solvent MD, 5 ns','Scoring interface retention'];
+  for(const s of steps){
+    btn.innerHTML='<span class="spin"></span> '+s;
+    note.textContent=s+' …';
+    await sleep(reduce?60:400);
+  }
+  btn.disabled=false; btn.textContent='Run screen';
+  note.textContent='Drag to orbit · scroll to zoom · click a Cys anchor to inspect the bond';
+  renderAll();
+  if(!reduce) $$('#rank .rk').forEach((el,i)=>el.animate(
+    [{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'none'}],
+    {duration:260,delay:i*55,easing:'ease-out'}));
+});
+$('#reset').addEventListener('click',()=>{
+  Object.assign(S,{carrier:'zif8',coating:'pda',cargo:'flu',peptide:'cglt',dens:1.2,link:1.2,shell:8,dia:180,
+    sel:{kind:'peptide',id:'cglt'}});
+  $('#p-dens').value=1.2; $('#p-link').value=1.2; $('#p-shell').value=8; $('#p-dia').value=180;
+  renderLib(); build3D(); renderAll();
+});
+
+/* theme */
+$('#theme').addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  const dark=cur? cur==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  renderChart();
+});
+
+/* tooltips */
+const tip=$('#tip');
+function showTip(html,e){ tip.innerHTML=html; tip.classList.add('on');
+  const x=Math.min(e.clientX+14,innerWidth-244), y=Math.max(8,e.clientY-14);
+  tip.style.left=x+'px'; tip.style.top=y+'px'; }
+function hideTip(){ tip.classList.remove('on'); }
+document.addEventListener('mousemove',e=>{
+  const m=e.target.closest('.meter[data-tip]');
+  if(m){ const [n,q,iqr]=m.dataset.tip.split('|');
+    showTip(`<b>${n}</b><br>Q<sub>HER2</sub> <span class="mono">${q}</span>
+      <br><span style="color:var(--ink-3)">measured IQR ${iqr}</span>`,e); return; }
+  const z=e.target.closest('.hovz');
+  if(z){ const i=+z.dataset.i, {T,a,b}=releaseCurves();
+    showTip(`<b>${T[i]} h</b>
+      <div class="row"><span><i style="background:var(--r50)"></i>pH 5.0</span>
+        <span class="mono">${Math.round(a[i])}%</span></div>
+      <div class="row"><span><i style="background:var(--r74)"></i>pH 7.4</span>
+        <span class="mono">${Math.round(b[i])}%</span></div>`,e); return; }
+  hideTip();
+});
+
+/* ================= init ================= */
+renderLib(); init3D(); build3D(); renderAll();
+</script>
