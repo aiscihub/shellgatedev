@@ -1053,7 +1053,7 @@ function molGroup(atoms,bonds,rep,kind){
     const m=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(rad(el),fill?2:1),
       new THREE.MeshStandardMaterial({color:ELC[el],roughness:.44,metalness:.02}),list.length);
     list.forEach((a,i)=>{M.compose(a.p,q,one);m.setMatrixAt(i,M);});
-    m.instanceMatrix.needsUpdate=true; m.userData={kind}; g.add(m);
+    m.instanceMatrix.needsUpdate=true; m.frustumCulled=false; m.userData={kind}; g.add(m);
   });
   if(!fill&&bonds.length){
     const UP=new THREE.Vector3(0,1,0), half={};
@@ -1071,7 +1071,7 @@ function molGroup(atoms,bonds,rep,kind){
         q.setFromUnitVectors(UP,d.clone().normalize());
         M.compose(A.clone().add(B).multiplyScalar(.5),q,new THREE.Vector3(1,L,1));
         m.setMatrixAt(i,M);});
-      m.instanceMatrix.needsUpdate=true; m.userData={kind}; g.add(m);
+      m.instanceMatrix.needsUpdate=true; m.frustumCulled=false; m.userData={kind}; g.add(m);
     });
   }
   return g;
@@ -1230,7 +1230,7 @@ function build3D(){
       let v; do{ v=new THREE.Vector3(rnd()*2-1,rnd()*2-1,rnd()*2-1); }while(v.length()>1);
       v.multiplyScalar(cr*0.70); Mc.compose(v,qc,oc); cg.setMatrixAt(i,Mc);
     }
-    cg.instanceMatrix.needsUpdate=true; cg.userData={kind:'cargo'};
+    cg.instanceMatrix.needsUpdate=true; cg.frustumCulled=false; cg.userData={kind:'cargo'};
     G.cargo.add(cg); root.add(G.cargo);
   }
 
@@ -1253,7 +1253,7 @@ function build3D(){
     q.setFromEuler(new THREE.Euler(rnd2()*3,rnd2()*3,rnd2()*3));
     M.compose(P,q,sc); im.setMatrixAt(i,M);
   }
-  im.instanceMatrix.needsUpdate=true; im.userData={kind:'coating'};
+  im.instanceMatrix.needsUpdate=true; im.frustumCulled=false; im.userData={kind:'coating'};
   if(!S.show.cut) G.coating.add(hull,im);
   // free PDA formed away from the cores — S3 fields show this, and it scales with dopamine load
   const freeN=S.mode!=='particle'?0:Math.round(clamp((S.shell-5)*13,0,150));
@@ -1273,7 +1273,7 @@ function build3D(){
       q.setFromEuler(new THREE.Euler(rf()*3,rf()*3,rf()*3));
       M.compose(p,q,sc); fm.setMatrixAt(i,M);
     }
-    fm.instanceMatrix.needsUpdate=true; fm.userData={kind:'coating'};
+    fm.instanceMatrix.needsUpdate=true; fm.frustumCulled=false; fm.userData={kind:'coating'};
     G.coating.add(fm);
   }
   root.add(G.coating);
@@ -1358,6 +1358,7 @@ function build3D(){
     for(;bi<nCh*p.n;bi++){ M.compose(org,qz,zero); beads.setMatrixAt(bi,M); }
     beads.instanceMatrix.needsUpdate=true;
     if(beads.instanceColor) beads.instanceColor.needsUpdate=true;
+    beads.frustumCulled=false;
     beads.userData={kind:'peptide'};
     G.peptide.add(beads); root.add(G.peptide);
   }
@@ -1530,10 +1531,14 @@ const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
 function install(kind,id){
   const changed=S[kind]!==id;
+  if(S.mode!=='particle'){          // leave Peptide/Site view so the whole construct is shown
+    S.mode='particle'; focusTarget.copy(HOME); rTarget=7.0;
+    $('#vp-note').style.display='';
+  }
   S[kind]=id; S.sel={kind,id};
   renderLib();
   if(changed||kind==='peptide') build3D(); else applySel();
-  renderAll();
+  syncTools(); renderAll();
 }
 function select(kind,id){
   if(!id){ S.sel={kind:'carrier',id:S.carrier}; } else { S.sel={kind,id}; }
