@@ -1,0 +1,17 @@
+# Render Blueprint: serves the demo as a static site.
+# Dashboard > New > Blueprint, pick this repo, and Render reads this file.
+services:
+  - type: web
+    name: moflect
+    runtime: static
+    branch: main
+    buildCommand: sh build.sh
+    staticPublishPath: public
+    autoDeployTrigger: commit
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
